@@ -1,0 +1,200 @@
+body {
+  background-color: $neutral-light-gray;
+}
+.container {
+  max-width: 730px;
+  margin: 64px auto;
+  .comment-reply-wrapper {
+    max-width: 100%;
+    .comment-wrapper {
+      margin-bottom: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 24px;
+      display: flex;
+      align-items: flex-start;
+      box-shadow: 0 0 10px 2px $neutral-light-gray;
+      .comment-upvote-downvote {
+        background-color: $neutral-light-gray;
+        border-radius: 8px;
+        padding: 14px 10px;
+        min-width: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        margin-right: 24px;
+        .upvote-icon,
+        .downvote-icon {
+          width: 11px;
+          height: 11px;
+          @include flex-center;
+          svg {
+            fill: $primary-light-grayish-blue;
+          }
+        }
+        .rate-number {
+          margin: 16px 0;
+          font-size: 17px;
+          color: $primary-moderate-blue;
+          font-weight: $bold-weight;
+        }
+      }
+      .comment-detail {
+        .comment-detail-header {
+          margin-bottom: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          .comment-detail-header-left {
+            display: flex;
+            align-items: center;
+            .comment-thumbnail {
+              width: 32px;
+              height: 32px;
+              border-radius: 100%;
+              overflow: hidden;
+              img {
+                width: 100%;
+                height: 100%;
+              }
+            }
+            .comment-username {
+              margin: 0 16px;
+              color: $neutral-dark-blue;
+              font-size: 17px;
+              font-weight: $bold-weight;
+            }
+            .comment-date {
+              font-size: 16px;
+              font-weight: $regular-weight;
+              color: $neutral-grayish-blue;
+            }
+          }
+          .comment-detail-header-right {
+            .comment-btn {
+              display: flex;
+              align-items: center;
+              svg {
+                margin-right: 8px;
+                width: 14px;
+                height: 13px;
+              }
+              span {
+                font-size: 16px;
+                font-weight: $bold-weight;
+              }
+            }
+            .reply-btn span {
+              color: $primary-moderate-blue;
+            }
+          }
+        }
+        .comment-detail-body p {
+          color: $neutral-grayish-blue;
+          font-size: 16px;
+          font-weight: $regular-weight;
+          line-height: 26px;
+          padding-right: 28px;
+        }
+      }
+    }
+    .reply-wrapper {
+      padding-left: 94px;
+      position: relative;
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 46px;
+        width: 2px;
+        border-radius: 8px;
+        background-color: rgba(222, 222, 224, 0.94);
+      }
+      .reply-comment-wrapper {
+        .comment-detail .comment-detail-body p {
+          padding-right: 8px;
+          .replied-username {
+            font-weight: $medium-weight;
+            color: $primary-moderate-blue;
+          }
+        }
+      }
+    }
+    .active-user-comment {
+      .comment-detail {
+        .comment-detail-header-left {
+          .comment-username {
+            margin-right: 12px !important;
+          }
+          .active-user-badge {
+            padding: 2px 6px;
+            background-color: $primary-moderate-blue;
+            color: $neutral-white;
+            font-size: 13px;
+            border-radius: 2px;
+            font-weight: $medium-weight;
+            margin-right: 16px;
+          }
+        }
+        .comment-detail-header-right {
+          display: flex;
+          .delete-btn {
+            span {
+              color: $primary-soft-red;
+            }
+          }
+          .edit-btn {
+            span {
+              color: $primary-moderate-blue;
+            }
+            margin-left: 24px;
+          }
+        }
+      }
+    }
+  }
+  .add-comment-wrapper {
+    display: flex;
+    background-color: $neutral-white;
+    padding: 28px 24px;
+    max-width: 100%;
+    align-items: flex-start;
+    border-radius: 8px;
+    box-shadow: 0 0 10px 2px $neutral-light-gray;
+    .add-comment-thumb {
+      width: 42px;
+      height: 42px;
+      border-radius: 100%;
+      overflow: hidden;
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+    .add-comment-field {
+      flex-grow: 1;
+      margin: 0 16px;
+      min-height: 96px;
+      border-radius: 8px;
+      border: 1px solid $neutral-light-gray;
+      padding: 12px 20px;
+      ::placeholder {
+        color: #a5a5a5;
+        font-size: 16px;
+        font-weight: $medium-weight;
+      }
+    }
+    .primary-btn {
+      width: 104px;
+      height: 46px;
+      @include flex-center;
+      background-color: $primary-moderate-blue;
+      border-radius: 8px;
+      color: $neutral-white;
+      font-size: 16px;
+      font-weight: $medium-weight;
+    }
+  }
+}

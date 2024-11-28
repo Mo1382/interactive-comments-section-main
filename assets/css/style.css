@@ -1,0 +1,217 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Rubik", serif;
+}
+
+a {
+  text-decoration: none;
+}
+
+li,
+ol {
+  list-style-type: none;
+}
+
+button {
+  border: none;
+}
+
+body {
+  background-color: #eaecf1;
+}
+
+.container {
+  max-width: 730px;
+  margin: 64px auto;
+}
+.container .comment-reply-wrapper {
+  max-width: 100%;
+}
+.container .comment-reply-wrapper .comment-wrapper {
+  margin-bottom: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  align-items: flex-start;
+  box-shadow: 0 0 10px 2px #eaecf1;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment-upvote-downvote {
+  background-color: #eaecf1;
+  border-radius: 8px;
+  padding: 14px 10px;
+  min-width: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  margin-right: 24px;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment-upvote-downvote .upvote-icon,
+.container .comment-reply-wrapper .comment-wrapper .comment-upvote-downvote .downvote-icon {
+  width: 11px;
+  height: 11px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment-upvote-downvote .upvote-icon svg,
+.container .comment-reply-wrapper .comment-wrapper .comment-upvote-downvote .downvote-icon svg {
+  fill: #c3c4ef;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment-upvote-downvote .rate-number {
+  margin: 16px 0;
+  font-size: 17px;
+  color: #5457b6;
+  font-weight: 700;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header .comment-detail-header-left {
+  display: flex;
+  align-items: center;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header .comment-detail-header-left .comment-thumbnail {
+  width: 32px;
+  height: 32px;
+  border-radius: 100%;
+  overflow: hidden;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header .comment-detail-header-left .comment-thumbnail img {
+  width: 100%;
+  height: 100%;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header .comment-detail-header-left .comment-username {
+  margin: 0 16px;
+  color: #324152;
+  font-size: 17px;
+  font-weight: 700;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header .comment-detail-header-left .comment-date {
+  font-size: 16px;
+  font-weight: 400;
+  color: #67727e;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header .comment-detail-header-right .comment-btn {
+  display: flex;
+  align-items: center;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header .comment-detail-header-right .comment-btn svg {
+  margin-right: 8px;
+  width: 14px;
+  height: 13px;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header .comment-detail-header-right .comment-btn span {
+  font-size: 16px;
+  font-weight: 700;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header .comment-detail-header-right .reply-btn span {
+  color: #5457b6;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-body p {
+  color: #67727e;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+  padding-right: 28px;
+}
+.container .comment-reply-wrapper .reply-wrapper {
+  padding-left: 94px;
+  position: relative;
+}
+.container .comment-reply-wrapper .reply-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 46px;
+  width: 2px;
+  border-radius: 8px;
+  background-color: rgba(222, 222, 224, 0.94);
+}
+.container .comment-reply-wrapper .reply-wrapper .reply-comment-wrapper .comment-detail .comment-detail-body p {
+  padding-right: 8px;
+}
+.container .comment-reply-wrapper .reply-wrapper .reply-comment-wrapper .comment-detail .comment-detail-body p .replied-username {
+  font-weight: 500;
+  color: #5457b6;
+}
+.container .comment-reply-wrapper .active-user-comment .comment-detail .comment-detail-header-left .comment-username {
+  margin-right: 12px !important;
+}
+.container .comment-reply-wrapper .active-user-comment .comment-detail .comment-detail-header-left .active-user-badge {
+  padding: 2px 6px;
+  background-color: #5457b6;
+  color: #ffffff;
+  font-size: 13px;
+  border-radius: 2px;
+  font-weight: 500;
+  margin-right: 16px;
+}
+.container .comment-reply-wrapper .active-user-comment .comment-detail .comment-detail-header-right {
+  display: flex;
+}
+.container .comment-reply-wrapper .active-user-comment .comment-detail .comment-detail-header-right .delete-btn span {
+  color: #ed6468;
+}
+.container .comment-reply-wrapper .active-user-comment .comment-detail .comment-detail-header-right .edit-btn {
+  margin-left: 24px;
+}
+.container .comment-reply-wrapper .active-user-comment .comment-detail .comment-detail-header-right .edit-btn span {
+  color: #5457b6;
+}
+.container .add-comment-wrapper {
+  display: flex;
+  background-color: #ffffff;
+  padding: 28px 24px;
+  max-width: 100%;
+  align-items: flex-start;
+  border-radius: 8px;
+  box-shadow: 0 0 10px 2px #eaecf1;
+}
+.container .add-comment-wrapper .add-comment-thumb {
+  width: 42px;
+  height: 42px;
+  border-radius: 100%;
+  overflow: hidden;
+}
+.container .add-comment-wrapper .add-comment-thumb img {
+  width: 100%;
+  height: 100%;
+}
+.container .add-comment-wrapper .add-comment-field {
+  flex-grow: 1;
+  margin: 0 16px;
+  min-height: 96px;
+  border-radius: 8px;
+  border: 1px solid #eaecf1;
+  padding: 12px 20px;
+}
+.container .add-comment-wrapper .add-comment-field ::-moz-placeholder {
+  color: #a5a5a5;
+  font-size: 16px;
+  font-weight: 500;
+}
+.container .add-comment-wrapper .add-comment-field ::placeholder {
+  color: #a5a5a5;
+  font-size: 16px;
+  font-weight: 500;
+}
+.container .add-comment-wrapper .primary-btn {
+  width: 104px;
+  height: 46px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #5457b6;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+}/*# sourceMappingURL=style.css.map */
