@@ -18,8 +18,59 @@ button {
   border: none;
 }
 
+textarea {
+  resize: none;
+  field-sizing: content;
+}
+
 body {
   background-color: #eaecf1;
+}
+
+.add-comment-field {
+  flex-grow: 1;
+  margin: 0 16px;
+  min-height: 96px;
+  border-radius: 8px;
+  border: 1px solid #eaecf1;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+  color: #324152;
+  transition: border-color 0.2s ease;
+  outline: none;
+}
+.add-comment-field:focus {
+  border-color: #67727e;
+}
+.add-comment-field ::-moz-placeholder {
+  color: #a5a5a5;
+  font-size: 16px;
+  font-weight: 500;
+}
+.add-comment-field ::placeholder {
+  color: #a5a5a5;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.primary-btn {
+  width: 104px;
+  height: 46px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #5457b6;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background-color 0.4s ease;
+  cursor: pointer;
+}
+.primary-btn:hover {
+  background-color: #c3c4ef;
 }
 
 .container {
@@ -28,9 +79,9 @@ body {
 }
 .container .comment-reply-wrapper {
   max-width: 100%;
-}
-.container .comment-reply-wrapper .comment-wrapper {
   margin-bottom: 20px;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment {
   background-color: #fff;
   border-radius: 8px;
   padding: 24px;
@@ -38,7 +89,7 @@ body {
   align-items: flex-start;
   box-shadow: 0 0 10px 2px #eaecf1;
 }
-.container .comment-reply-wrapper .comment-wrapper .comment-upvote-downvote {
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-upvote-downvote {
   background-color: #eaecf1;
   border-radius: 8px;
   padding: 14px 10px;
@@ -49,77 +100,117 @@ body {
   align-items: center;
   margin-right: 24px;
 }
-.container .comment-reply-wrapper .comment-wrapper .comment-upvote-downvote .upvote-icon,
-.container .comment-reply-wrapper .comment-wrapper .comment-upvote-downvote .downvote-icon {
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-upvote-downvote .upvote-icon,
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-upvote-downvote .downvote-icon {
   width: 11px;
   height: 11px;
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
 }
-.container .comment-reply-wrapper .comment-wrapper .comment-upvote-downvote .upvote-icon svg,
-.container .comment-reply-wrapper .comment-wrapper .comment-upvote-downvote .downvote-icon svg {
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-upvote-downvote .upvote-icon svg path,
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-upvote-downvote .downvote-icon svg path {
   fill: #c3c4ef;
+  transition: fill 0.4s ease;
 }
-.container .comment-reply-wrapper .comment-wrapper .comment-upvote-downvote .rate-number {
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-upvote-downvote .upvote-icon:hover svg path,
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-upvote-downvote .downvote-icon:hover svg path {
+  fill: #5457b6;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-upvote-downvote .rate-number {
   margin: 16px 0;
   font-size: 17px;
   color: #5457b6;
   font-weight: 700;
 }
-.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header {
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-detail .comment-detail-header {
   margin-bottom: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header .comment-detail-header-left {
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-detail .comment-detail-header .comment-detail-header-left {
   display: flex;
   align-items: center;
 }
-.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header .comment-detail-header-left .comment-thumbnail {
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-detail .comment-detail-header .comment-detail-header-left .comment-thumbnail {
   width: 32px;
   height: 32px;
   border-radius: 100%;
   overflow: hidden;
 }
-.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header .comment-detail-header-left .comment-thumbnail img {
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-detail .comment-detail-header .comment-detail-header-left .comment-thumbnail img {
   width: 100%;
   height: 100%;
 }
-.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header .comment-detail-header-left .comment-username {
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-detail .comment-detail-header .comment-detail-header-left .comment-username {
   margin: 0 16px;
   color: #324152;
   font-size: 17px;
   font-weight: 700;
 }
-.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header .comment-detail-header-left .comment-date {
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-detail .comment-detail-header .comment-detail-header-left .comment-date {
   font-size: 16px;
   font-weight: 400;
   color: #67727e;
 }
-.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header .comment-detail-header-right .comment-btn {
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-detail .comment-detail-header .comment-detail-header-right .comment-btn {
+  cursor: pointer;
   display: flex;
   align-items: center;
 }
-.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header .comment-detail-header-right .comment-btn svg {
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-detail .comment-detail-header .comment-detail-header-right .comment-btn svg {
   margin-right: 8px;
   width: 14px;
   height: 13px;
 }
-.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header .comment-detail-header-right .comment-btn span {
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-detail .comment-detail-header .comment-detail-header-right .comment-btn svg path {
+  transition: fill 0.4s ease;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-detail .comment-detail-header .comment-detail-header-right .comment-btn span {
   font-size: 16px;
   font-weight: 700;
 }
-.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-header .comment-detail-header-right .reply-btn span {
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-detail .comment-detail-header .comment-detail-header-right .reply-btn,
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-detail .comment-detail-header .comment-detail-header-right .edit-btn {
   color: #5457b6;
+  transition: color 0.4s ease;
 }
-.container .comment-reply-wrapper .comment-wrapper .comment-detail .comment-detail-body p {
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-detail .comment-detail-header .comment-detail-header-right .reply-btn:hover,
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-detail .comment-detail-header .comment-detail-header-right .edit-btn:hover {
+  color: #c3c4ef;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-detail .comment-detail-header .comment-detail-header-right .reply-btn:hover svg path,
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-detail .comment-detail-header .comment-detail-header-right .edit-btn:hover svg path {
+  fill: #c3c4ef;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment .comment-detail .comment-detail-body p {
   color: #67727e;
   font-size: 16px;
   font-weight: 400;
   line-height: 26px;
   padding-right: 28px;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment-edit .comment-detail {
+  width: 100%;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment-edit .comment-detail .comment-detail-body {
+  display: flex;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment-edit .comment-detail .comment-detail-body .add-comment-field {
+  margin: 0;
+}
+.container .comment-reply-wrapper .comment-wrapper .comment-edit .comment-detail .comment-detail-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+.container .comment-reply-wrapper .comment-wrapper .add-comment-wrapper {
+  margin-top: 12px;
+}
+.container .comment-reply-wrapper .comment-wrapper:not(:last-child) {
+  margin-bottom: 20px;
 }
 .container .comment-reply-wrapper .reply-wrapper {
   padding-left: 94px;
@@ -135,17 +226,17 @@ body {
   border-radius: 8px;
   background-color: rgba(222, 222, 224, 0.94);
 }
-.container .comment-reply-wrapper .reply-wrapper .reply-comment-wrapper .comment-detail .comment-detail-body p {
+.container .comment-reply-wrapper .reply-wrapper .reply-comment-wrapper .comment .comment-detail .comment-detail-body p {
   padding-right: 8px;
 }
-.container .comment-reply-wrapper .reply-wrapper .reply-comment-wrapper .comment-detail .comment-detail-body p .replied-username {
+.container .comment-reply-wrapper .reply-wrapper .reply-comment-wrapper .comment .comment-detail .comment-detail-body p .replied-username {
   font-weight: 500;
   color: #5457b6;
 }
-.container .comment-reply-wrapper .active-user-comment .comment-detail .comment-detail-header-left .comment-username {
+.container .comment-reply-wrapper .active-user-comment .comment .comment-detail .comment-detail-header-left .comment-username {
   margin-right: 12px !important;
 }
-.container .comment-reply-wrapper .active-user-comment .comment-detail .comment-detail-header-left .active-user-badge {
+.container .comment-reply-wrapper .active-user-comment .comment .comment-detail .comment-detail-header-left .active-user-badge {
   padding: 2px 6px;
   background-color: #5457b6;
   color: #ffffff;
@@ -154,17 +245,21 @@ body {
   font-weight: 500;
   margin-right: 16px;
 }
-.container .comment-reply-wrapper .active-user-comment .comment-detail .comment-detail-header-right {
+.container .comment-reply-wrapper .active-user-comment .comment .comment-detail .comment-detail-header-right {
   display: flex;
 }
-.container .comment-reply-wrapper .active-user-comment .comment-detail .comment-detail-header-right .delete-btn span {
+.container .comment-reply-wrapper .active-user-comment .comment .comment-detail .comment-detail-header-right .delete-btn {
   color: #ed6468;
+  transition: color 0.4s ease;
 }
-.container .comment-reply-wrapper .active-user-comment .comment-detail .comment-detail-header-right .edit-btn {
+.container .comment-reply-wrapper .active-user-comment .comment .comment-detail .comment-detail-header-right .delete-btn:hover {
+  color: #ffb8bb;
+}
+.container .comment-reply-wrapper .active-user-comment .comment .comment-detail .comment-detail-header-right .delete-btn:hover svg path {
+  fill: #ffb8bb;
+}
+.container .comment-reply-wrapper .active-user-comment .comment .comment-detail .comment-detail-header-right .edit-btn {
   margin-left: 24px;
-}
-.container .comment-reply-wrapper .active-user-comment .comment-detail .comment-detail-header-right .edit-btn span {
-  color: #5457b6;
 }
 .container .add-comment-wrapper {
   display: flex;
@@ -184,34 +279,4 @@ body {
 .container .add-comment-wrapper .add-comment-thumb img {
   width: 100%;
   height: 100%;
-}
-.container .add-comment-wrapper .add-comment-field {
-  flex-grow: 1;
-  margin: 0 16px;
-  min-height: 96px;
-  border-radius: 8px;
-  border: 1px solid #eaecf1;
-  padding: 12px 20px;
-}
-.container .add-comment-wrapper .add-comment-field ::-moz-placeholder {
-  color: #a5a5a5;
-  font-size: 16px;
-  font-weight: 500;
-}
-.container .add-comment-wrapper .add-comment-field ::placeholder {
-  color: #a5a5a5;
-  font-size: 16px;
-  font-weight: 500;
-}
-.container .add-comment-wrapper .primary-btn {
-  width: 104px;
-  height: 46px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #5457b6;
-  border-radius: 8px;
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 500;
 }/*# sourceMappingURL=style.css.map */

@@ -1,103 +1,185 @@
 body {
   background-color: $neutral-light-gray;
 }
+
+// Styles for sections in different parts
+.add-comment-field {
+  flex-grow: 1;
+  margin: 0 16px;
+  min-height: 96px;
+  border-radius: 8px;
+  border: 1px solid $neutral-light-gray;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: $regular-weight;
+  line-height: 26px;
+  color: $neutral-dark-blue;
+  transition: border-color 0.2s ease;
+  outline: none;
+  &:focus {
+    border-color: $neutral-grayish-blue;
+  }
+  ::placeholder {
+    color: #a5a5a5;
+    font-size: 16px;
+    font-weight: $medium-weight;
+  }
+}
+
+.primary-btn {
+  width: 104px;
+  height: 46px;
+  @include flex-center;
+  background-color: $primary-moderate-blue;
+  border-radius: 8px;
+  color: $neutral-white;
+  font-size: 16px;
+  font-weight: $medium-weight;
+  transition: background-color 0.4s ease;
+  cursor: pointer;
+  &:hover {
+    background-color: $primary-light-grayish-blue;
+  }
+}
+
 .container {
   max-width: 730px;
   margin: 64px auto;
   .comment-reply-wrapper {
     max-width: 100%;
+    margin-bottom: 20px;
     .comment-wrapper {
-      margin-bottom: 20px;
-      background-color: #fff;
-      border-radius: 8px;
-      padding: 24px;
-      display: flex;
-      align-items: flex-start;
-      box-shadow: 0 0 10px 2px $neutral-light-gray;
-      .comment-upvote-downvote {
-        background-color: $neutral-light-gray;
+      .comment {
+        background-color: #fff;
         border-radius: 8px;
-        padding: 14px 10px;
-        min-width: 40px;
+        padding: 24px;
         display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-        margin-right: 24px;
-        .upvote-icon,
-        .downvote-icon {
-          width: 11px;
-          height: 11px;
-          @include flex-center;
-          svg {
-            fill: $primary-light-grayish-blue;
+        align-items: flex-start;
+        box-shadow: 0 0 10px 2px $neutral-light-gray;
+        .comment-upvote-downvote {
+          background-color: $neutral-light-gray;
+          border-radius: 8px;
+          padding: 14px 10px;
+          min-width: 40px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          align-items: center;
+          margin-right: 24px;
+          .upvote-icon,
+          .downvote-icon {
+            width: 11px;
+            height: 11px;
+            @include flex-center;
+            cursor: pointer;
+            svg path {
+              fill: $primary-light-grayish-blue;
+              transition: fill 0.4s ease;
+            }
+            &:hover svg path {
+              fill: $primary-moderate-blue;
+            }
+          }
+          .rate-number {
+            margin: 16px 0;
+            font-size: 17px;
+            color: $primary-moderate-blue;
+            font-weight: $bold-weight;
           }
         }
-        .rate-number {
-          margin: 16px 0;
-          font-size: 17px;
-          color: $primary-moderate-blue;
-          font-weight: $bold-weight;
-        }
-      }
-      .comment-detail {
-        .comment-detail-header {
-          margin-bottom: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          .comment-detail-header-left {
+        .comment-detail {
+          .comment-detail-header {
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            .comment-thumbnail {
-              width: 32px;
-              height: 32px;
-              border-radius: 100%;
-              overflow: hidden;
-              img {
-                width: 100%;
-                height: 100%;
-              }
-            }
-            .comment-username {
-              margin: 0 16px;
-              color: $neutral-dark-blue;
-              font-size: 17px;
-              font-weight: $bold-weight;
-            }
-            .comment-date {
-              font-size: 16px;
-              font-weight: $regular-weight;
-              color: $neutral-grayish-blue;
-            }
-          }
-          .comment-detail-header-right {
-            .comment-btn {
+            justify-content: space-between;
+            .comment-detail-header-left {
               display: flex;
               align-items: center;
-              svg {
-                margin-right: 8px;
-                width: 14px;
-                height: 13px;
+              .comment-thumbnail {
+                width: 32px;
+                height: 32px;
+                border-radius: 100%;
+                overflow: hidden;
+                img {
+                  width: 100%;
+                  height: 100%;
+                }
               }
-              span {
-                font-size: 16px;
+              .comment-username {
+                margin: 0 16px;
+                color: $neutral-dark-blue;
+                font-size: 17px;
                 font-weight: $bold-weight;
               }
+              .comment-date {
+                font-size: 16px;
+                font-weight: $regular-weight;
+                color: $neutral-grayish-blue;
+              }
             }
-            .reply-btn span {
-              color: $primary-moderate-blue;
+            .comment-detail-header-right {
+              .comment-btn {
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                svg {
+                  margin-right: 8px;
+                  width: 14px;
+                  height: 13px;
+                  path {
+                    transition: fill 0.4s ease;
+                  }
+                }
+                span {
+                  font-size: 16px;
+                  font-weight: $bold-weight;
+                }
+              }
+              .reply-btn,
+              .edit-btn {
+                color: $primary-moderate-blue;
+                transition: color 0.4s ease;
+                &:hover {
+                  color: $primary-light-grayish-blue;
+                  svg path {
+                    fill: $primary-light-grayish-blue;
+                  }
+                }
+              }
             }
           }
-        }
-        .comment-detail-body p {
-          color: $neutral-grayish-blue;
-          font-size: 16px;
-          font-weight: $regular-weight;
-          line-height: 26px;
-          padding-right: 28px;
+          .comment-detail-body p {
+            color: $neutral-grayish-blue;
+            font-size: 16px;
+            font-weight: $regular-weight;
+            line-height: 26px;
+            padding-right: 28px;
+          }
         }
       }
+      .comment-edit {
+        .comment-detail {
+          width: 100%;
+          .comment-detail-body {
+            display: flex;
+            .add-comment-field {
+              margin: 0;
+            }
+          }
+          .comment-detail-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+          }
+        }
+      }
+      .add-comment-wrapper {
+        margin-top: 12px;
+      }
+    }
+    .comment-wrapper:not(:last-child) {
+      margin-bottom: 20px;
     }
     .reply-wrapper {
       padding-left: 94px;
@@ -112,7 +194,7 @@ body {
         border-radius: 8px;
         background-color: rgba(222, 222, 224, 0.94);
       }
-      .reply-comment-wrapper {
+      .reply-comment-wrapper .comment {
         .comment-detail .comment-detail-body p {
           padding-right: 8px;
           .replied-username {
@@ -122,7 +204,7 @@ body {
         }
       }
     }
-    .active-user-comment {
+    .active-user-comment .comment {
       .comment-detail {
         .comment-detail-header-left {
           .comment-username {
@@ -141,14 +223,16 @@ body {
         .comment-detail-header-right {
           display: flex;
           .delete-btn {
-            span {
-              color: $primary-soft-red;
+            color: $primary-soft-red;
+            transition: color 0.4s ease;
+            &:hover {
+              color: $primary-pale-red;
+              svg path {
+                fill: $primary-pale-red;
+              }
             }
           }
           .edit-btn {
-            span {
-              color: $primary-moderate-blue;
-            }
             margin-left: 24px;
           }
         }
@@ -172,29 +256,6 @@ body {
         width: 100%;
         height: 100%;
       }
-    }
-    .add-comment-field {
-      flex-grow: 1;
-      margin: 0 16px;
-      min-height: 96px;
-      border-radius: 8px;
-      border: 1px solid $neutral-light-gray;
-      padding: 12px 20px;
-      ::placeholder {
-        color: #a5a5a5;
-        font-size: 16px;
-        font-weight: $medium-weight;
-      }
-    }
-    .primary-btn {
-      width: 104px;
-      height: 46px;
-      @include flex-center;
-      background-color: $primary-moderate-blue;
-      border-radius: 8px;
-      color: $neutral-white;
-      font-size: 16px;
-      font-weight: $medium-weight;
     }
   }
 }
