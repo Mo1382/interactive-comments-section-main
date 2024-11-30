@@ -119,7 +119,7 @@ body {
           min-width: 40px;
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
+          justify-content: center;
           align-items: center;
           margin-right: 24px;
           .upvote-icon,
@@ -223,7 +223,7 @@ body {
               margin: 0;
             }
           }
-          .comment-detail-footer {
+          .comment-update {
             display: flex;
             justify-content: flex-end;
             margin-top: 20px;

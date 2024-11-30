@@ -1,0 +1,79 @@
+// @media screen and (max-width: 480px) {
+@media screen and (max-width: 520px) {
+  .container {
+    margin: 32px 16px;
+    .comment-reply-wrapper {
+      margin-bottom: 16px;
+      .comment {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        .comment-detail-header {
+          margin-bottom: 16px;
+        }
+        .comment-detail-body {
+          padding-right: 0;
+        }
+        .comment-detail-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 16px;
+          .comment-upvote-downvote {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            margin-right: 0;
+            padding: 10px 14px;
+          }
+          .edit-btn {
+            margin-left: 20px;
+          }
+        }
+      }
+      .comment-edit {
+        .comment-update {
+          margin: 16px 0;
+        }
+      }
+      .add-comment-wrapper {
+        margin-top: 16px;
+      }
+      .comment-wrapper:not(:last-child) {
+        margin-bottom: 16px;
+      }
+      .reply-wrapper {
+        padding-left: 18px;
+        &::before {
+          left: 0;
+        }
+      }
+      .active-user-comment .comment {
+        .comment-detail-header-left {
+          .comment-username {
+            margin-right: 8px !important;
+          }
+        }
+      }
+    }
+    .add-comment-wrapper {
+      padding: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      .add-comment-thumb {
+        width: 32px;
+        height: 32px;
+        order: 1;
+      }
+      .add-comment-field {
+        order: 0;
+        width: 100%;
+        margin: 0 0 16px;
+      }
+      .primary-btn {
+        order: 2;
+      }
+    }
+  }
+}
