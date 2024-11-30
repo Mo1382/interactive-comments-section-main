@@ -341,7 +341,103 @@ body {
   height: 100%;
 }
 
+@media screen and (max-width: 794px) {
+  .container {
+    margin: 64px 32px;
+  }
+  .container .comment-reply-wrapper {
+    margin-bottom: 18px;
+  }
+  .container .comment-reply-wrapper .comment {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  .container .comment-reply-wrapper .comment .comment-detail-header {
+    margin-bottom: 16px;
+  }
+  .container .comment-reply-wrapper .comment .comment-detail-body {
+    padding-right: 0;
+  }
+  .container .comment-reply-wrapper .comment .comment-detail-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+  }
+  .container .comment-reply-wrapper .comment .comment-detail-footer .comment-upvote-downvote {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-right: 0;
+    padding: 10px 14px;
+  }
+  .container .comment-reply-wrapper .comment .comment-detail-footer .edit-btn {
+    margin-left: 20px;
+  }
+  .container .comment-reply-wrapper .comment-edit .comment-update {
+    margin: 16px 0;
+  }
+  .container .comment-reply-wrapper .add-comment-wrapper {
+    margin-top: 16px;
+  }
+  .container .comment-reply-wrapper .comment-wrapper:not(:last-child) {
+    margin-bottom: 16px;
+  }
+  .container .comment-reply-wrapper .reply-wrapper {
+    padding-left: 18px;
+  }
+  .container .comment-reply-wrapper .reply-wrapper::before {
+    left: 0;
+  }
+  .container .comment-reply-wrapper .active-user-comment .comment .comment-detail-header-left .comment-username {
+    margin-right: 8px !important;
+  }
+  .container .add-comment-wrapper {
+    padding: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .container .add-comment-wrapper .add-comment-thumb {
+    width: 32px;
+    height: 32px;
+    order: 1;
+  }
+  .container .add-comment-wrapper .add-comment-field {
+    order: 0;
+    width: 100%;
+    margin: 0 0 16px;
+  }
+  .container .add-comment-wrapper .primary-btn {
+    order: 2;
+  }
+}
 @media screen and (max-width: 520px) {
+  .modal-overlay {
+    padding: 0 16px;
+  }
+  .modal-overlay .modal-wrapper {
+    width: 100%;
+    padding: 24px 28px;
+  }
+  .modal-overlay .modal-wrapper .modal-title {
+    font-size: 22px;
+  }
+  .modal-overlay .modal-wrapper .modal-desc {
+    padding-right: 0;
+    margin-bottom: 20px;
+  }
+  .modal-overlay .modal-wrapper .modal-footer {
+    width: 100%;
+  }
+  .modal-overlay .modal-wrapper .modal-footer button {
+    height: 48px;
+    flex-basis: 50%;
+  }
+  .modal-overlay .modal-wrapper .modal-footer button:first-child {
+    margin-right: 16px;
+  }
   .container {
     margin: 32px 16px;
   }

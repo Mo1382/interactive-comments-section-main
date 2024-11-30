@@ -1,5 +1,29 @@
 // @media screen and (max-width: 480px) {
 @media screen and (max-width: 520px) {
+  .modal-overlay {
+    padding: 0 16px;
+    .modal-wrapper {
+      width: 100%;
+      padding: 24px 28px;
+      .modal-title {
+        font-size: 22px;
+      }
+      .modal-desc {
+        padding-right: 0;
+        margin-bottom: 20px;
+      }
+      .modal-footer {
+        width: 100%;
+        button {
+          height: 48px;
+          flex-basis: 50%;
+        }
+        button:first-child {
+          margin-right: 16px;
+        }
+      }
+    }
+  }
   .container {
     margin: 32px 16px;
     .comment-reply-wrapper {
