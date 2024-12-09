@@ -354,16 +354,16 @@ body {
     flex-direction: column;
   }
   .container .comment-reply-wrapper .comment .comment-detail-header {
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
   .container .comment-reply-wrapper .comment .comment-detail-body {
-    padding-right: 0;
+    padding-right: 12px;
   }
   .container .comment-reply-wrapper .comment .comment-detail-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 16px;
+    margin-top: 20px;
   }
   .container .comment-reply-wrapper .comment .comment-detail-footer .comment-upvote-downvote {
     flex-direction: row;
@@ -372,8 +372,14 @@ body {
     margin-right: 0;
     padding: 10px 14px;
   }
-  .container .comment-reply-wrapper .comment .comment-detail-footer .edit-btn {
-    margin-left: 20px;
+  .container .comment-reply-wrapper .comment .comment-detail-footer .comment-upvote-downvote .rate-number {
+    margin: 0 16px;
+  }
+  .container .comment-reply-wrapper .comment .comment-detail-footer .comment-btns {
+    display: flex;
+  }
+  .container .comment-reply-wrapper .comment .comment-detail-footer .comment-btns .edit-btn {
+    margin-left: 22px;
   }
   .container .comment-reply-wrapper .comment-edit .comment-update {
     margin: 16px 0;
@@ -385,7 +391,7 @@ body {
     margin-bottom: 16px;
   }
   .container .comment-reply-wrapper .reply-wrapper {
-    padding-left: 18px;
+    padding-left: 32px;
   }
   .container .comment-reply-wrapper .reply-wrapper::before {
     left: 0;
@@ -394,7 +400,7 @@ body {
     margin-right: 8px !important;
   }
   .container .add-comment-wrapper {
-    padding: 16px;
+    padding: 20px;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
@@ -407,13 +413,13 @@ body {
   .container .add-comment-wrapper .add-comment-field {
     order: 0;
     width: 100%;
-    margin: 0 0 16px;
+    margin: 0 0 20px;
   }
   .container .add-comment-wrapper .primary-btn {
     order: 2;
   }
 }
-@media screen and (max-width: 520px) {
+@media screen and (max-width: 480px) {
   .modal-overlay {
     padding: 0 16px;
   }
@@ -456,56 +462,18 @@ body {
     padding-right: 0;
   }
   .container .comment-reply-wrapper .comment .comment-detail-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     margin-top: 16px;
   }
-  .container .comment-reply-wrapper .comment .comment-detail-footer .comment-upvote-downvote {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    margin-right: 0;
-    padding: 10px 14px;
-  }
-  .container .comment-reply-wrapper .comment .comment-detail-footer .edit-btn {
+  .container .comment-reply-wrapper .comment .comment-btns .edit-btn {
     margin-left: 20px;
   }
-  .container .comment-reply-wrapper .comment-edit .comment-update {
-    margin: 16px 0;
-  }
-  .container .comment-reply-wrapper .add-comment-wrapper {
-    margin-top: 16px;
-  }
-  .container .comment-reply-wrapper .comment-wrapper:not(:last-child) {
-    margin-bottom: 16px;
-  }
-  .container .comment-reply-wrapper .reply-wrapper {
+  .container .comment-edit .reply-wrapper {
     padding-left: 18px;
-  }
-  .container .comment-reply-wrapper .reply-wrapper::before {
-    left: 0;
-  }
-  .container .comment-reply-wrapper .active-user-comment .comment .comment-detail-header-left .comment-username {
-    margin-right: 8px !important;
   }
   .container .add-comment-wrapper {
     padding: 16px;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .container .add-comment-wrapper .add-comment-thumb {
-    width: 32px;
-    height: 32px;
-    order: 1;
   }
   .container .add-comment-wrapper .add-comment-field {
-    order: 0;
-    width: 100%;
     margin: 0 0 16px;
-  }
-  .container .add-comment-wrapper .primary-btn {
-    order: 2;
   }
 }/*# sourceMappingURL=style.css.map */

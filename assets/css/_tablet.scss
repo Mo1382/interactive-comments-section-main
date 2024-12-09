@@ -8,25 +8,32 @@
         display: flex;
         flex-direction: column;
         .comment-detail-header {
-          margin-bottom: 16px;
+          margin-bottom: 14px;
         }
         .comment-detail-body {
-          padding-right: 0;
+          padding-right: 12px;
         }
         .comment-detail-footer {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-top: 16px;
+          margin-top: 20px;
           .comment-upvote-downvote {
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
             margin-right: 0;
             padding: 10px 14px;
+            .rate-number {
+              margin: 0 16px;
+            }
           }
-          .edit-btn {
-            margin-left: 20px;
+
+          .comment-btns {
+            display: flex;
+            .edit-btn {
+              margin-left: 22px;
+            }
           }
         }
       }
@@ -42,7 +49,7 @@
         margin-bottom: 16px;
       }
       .reply-wrapper {
-        padding-left: 18px;
+        padding-left: 32px;
         &::before {
           left: 0;
         }
@@ -56,7 +63,7 @@
       }
     }
     .add-comment-wrapper {
-      padding: 16px;
+      padding: 20px;
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
@@ -68,7 +75,7 @@
       .add-comment-field {
         order: 0;
         width: 100%;
-        margin: 0 0 16px;
+        margin: 0 0 20px;
       }
       .primary-btn {
         order: 2;

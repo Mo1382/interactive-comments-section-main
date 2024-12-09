@@ -316,16 +316,20 @@ const setLayout = function () {
 
   commentWrapperEls.forEach(el => {
     const commentBtnEls = el.querySelectorAll(".comment-btn");
-    const UpvoteDownvoteEl = el.querySelector(".comment-upvote-downvote");
+    const upvoteDownvoteEl = el.querySelector(".comment-upvote-downvote");
     const commentDetailEl = el.querySelector(".comment-detail");
 
     const detailFooterEl = document.createElement("div");
+    detailFooterEl.innerHTML = "<div class='comment-btns'></div>";
+
+    const btnsWrapper = detailFooterEl.querySelector(".comment-btns");
+
     detailFooterEl.classList.add("comment-detail-footer");
     commentDetailEl.append(detailFooterEl);
 
-    detailFooterEl.appendChild(UpvoteDownvoteEl);
+    detailFooterEl.prepend(upvoteDownvoteEl);
     commentBtnEls.forEach(btn => {
-      detailFooterEl.append(btn);
+      btnsWrapper.append(btn);
     });
   });
 };
