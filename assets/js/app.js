@@ -3,14 +3,21 @@
 const storage = localStorage.getItem("appData");
 // console.log(storage);
 let isScreenDesktop;
+// Declaring here to be accessible in deleteBtn element event handler
+let deletingEl;
 
 // DOM Elements
 const containerEl = document.querySelector(".container");
 const addCommentEl = document.querySelector(
   ".container > .add-comment-wrapper"
 );
+const addCommentFieldEl = addCommentEl.querySelector(".add-comment-field");
 const commentReplyWrapperEl = document.querySelector(".comment-reply-wrapper");
 const sendBtn = document.querySelector("#send-btn");
+const modalOverlayEl = document.querySelector(".modal-overlay");
+const modalWrapperEl = document.querySelector(".modal-wrapper");
+const modalDeleteBtn = document.querySelector(".delete-modal-btn");
+const modalCancelBtn = document.querySelector(".cancel-modal-btn");
 
 // Functions
 /**
@@ -537,6 +544,52 @@ const findObjFromEl = function (commentObjs, el) {
   return replyEditing;
 };
 
+/**
+ * Calculates the animation duration of the provided HTML element based on its transition duration.
+ *
+ * @param {HTMLElement} el - The HTML element to calculate the animation duration for.
+ * @returns {number} The animation duration in milliseconds.
+ */
+const calcElAnimeDuration = function (el) {
+  const elDurationMs =
+    parseFloat(window.getComputedStyle(el).transitionDuration) * 1000;
+
+  return elDurationMs;
+};
+
+/**
+ * Opens a modal by setting the display property of the modal wrapper element to "flex" and
+ * setting the opacity of the first child element of the modal wrapper to 1 after a short delay.
+ *
+ * @param {HTMLElement} modalWrapperEl - The HTML element that wraps the whole modal section..
+ */
+const openModal = function (modalWrapperEl) {
+  modalWrapperEl.style.display = "flex";
+  modalWrapperEl.style.opacity = 1;
+
+  setTimeout(function () {
+    modalWrapperEl.firstElementChild.style.opacity = 1;
+  }, 0);
+};
+
+/**
+ * Closes a modal by setting the opacity of the modal wrapper element and its first child element to 0, and then hiding the modal wrapper element after a short delay.
+ *
+ * @param {HTMLElement} modalWrapperEl - The HTML element that wraps the whole modal section.
+ */
+const closeModal = function (modalWrapperEl) {
+  modalWrapperEl.firstElementChild.style.opacity = 0;
+  modalWrapperEl.style.opacity = 0;
+
+  const elHideDurationMs = calcElAnimeDuration(
+    modalWrapperEl.firstElementChild
+  );
+
+  setTimeout(function () {
+    modalWrapperEl.style.display = "none";
+  }, elHideDurationMs);
+};
+
 // Event handlers
 window.addEventListener("resize", function () {
   const screenWidth = window.innerWidth;
@@ -576,6 +629,9 @@ sendBtn.addEventListener("click", function (e) {
   showAddedComment(document.querySelectorAll(".comment-reply-wrapper"));
 
   saveToLocalStorage(appState);
+
+  // Clear the field after the new comment has been rendered
+  addCommentFieldEl.value = "";
 });
 
 // Event delegation for edit btns
@@ -623,4 +679,103 @@ ${revelantObj.replyingTo ? "@" + revelantObj.replyingTo : ""}${
   `;
 
   commentDetailEl.insertAdjacentHTML("beforeend", updateBtnHTML);
+});
+
+// Event delegation for update btns
+containerEl.addEventListener("click", function (e) {
+  const clickedEl = e.target;
+
+  // Matching strategy
+  if (!clickedEl.classList.contains("update-btn")) return;
+  //   console.log("matching strategy works");
+
+  // Finding the revelant comment el and obj of update btn clicked
+  const revelantEl = clickedEl.closest(".comment-wrapper");
+  const revelantObj = findObjFromEl(appState.comments, revelantEl);
+  //   console.log(revelantObj);
+
+  const newEditedContent = revelantEl.querySelector(".add-comment-field").value;
+
+  revelantObj.content = newEditedContent;
+
+  // Elemensts selection to change comment layout for updating it
+  const commentEl = revelantEl.querySelector(".comment");
+  const commentBodyEl = revelantEl.querySelector(".comment-detail-body");
+  const textFieldEl = revelantEl.querySelector(".add-comment-field");
+  const updateBtnHTML = revelantEl.querySelector(".comment-update");
+
+  textFieldEl.remove();
+
+  const commentDescHTML = `
+<p>
+${revelantObj.replyingTo ? "@" + revelantObj.replyingTo : ""}${
+    revelantObj.content
+  }
+</p>
+  `;
+
+  commentBodyEl.insertAdjacentHTML("afterbegin", commentDescHTML);
+
+  commentEl.classList.remove("comment-edit");
+
+  updateBtnHTML.remove();
+
+  revelantObj.isEditing = false;
+
+  saveToLocalStorage(appState);
+});
+
+// Event delegation for delete btns
+containerEl.addEventListener("click", function (e) {
+  const clickedEl = e.target;
+
+  // Matching strategy
+  if (!clickedEl.closest(".delete-btn")) return;
+
+  openModal(modalOverlayEl);
+
+  // It's going to be deleted when the user clicks "YES, DELETE" btn
+  deletingEl = clickedEl.closest(".comment-wrapper");
+});
+
+modalDeleteBtn.addEventListener("click", function (e) {
+  const deletingObj = findObjFromEl(appState.comments, deletingEl);
+  //   console.log(deletingObj);
+
+  // Deleting the commentObj from the appState
+  const deletingObjIndex = appState.comments.indexOf(deletingObj);
+  appState.comments.splice(deletingObjIndex, 1);
+
+  const elHideDurationMs = calcElAnimeDuration(
+    document.querySelector(".comment-reply-wrapper")
+  );
+
+  let isGoingToDelete;
+
+  // Deleting the commentEl from the DOM
+  if (!deletingEl.classList.contains("reply-comment-wrapper")) {
+    // Executed when user wants to delete the comment
+    isGoingToDelete = deletingEl.parentElement;
+  } else {
+    // Executed when user wants to delete the reply
+    const repliesWrapperEl = deletingEl.parentElement;
+    if (repliesWrapperEl.children.length === 1)
+      isGoingToDelete = deletingEl.parentElement;
+    else isGoingToDelete = deletingEl;
+  }
+
+  isGoingToDelete.style.opacity = 0;
+  setTimeout(() => {
+    isGoingToDelete.remove();
+  }, elHideDurationMs);
+
+  deletingEl = undefined;
+
+  saveToLocalStorage(appState);
+
+  closeModal(modalOverlayEl);
+});
+
+modalCancelBtn.addEventListener("click", function (e) {
+  closeModal(modalOverlayEl);
 });

@@ -54,6 +54,7 @@ body {
   z-index: 1;
   background-color: rgba(0, 0, 0, 0.45);
   @include flex-center;
+  transition: opacity 0.6s ease;
   display: none;
   .modal-wrapper {
     max-width: 400px;
@@ -106,7 +107,7 @@ body {
   .comment-reply-wrapper {
     max-width: 100%;
     margin-bottom: 20px;
-    transition: opacity 2s ease;
+    transition: opacity 0.6s ease;
     .comment-wrapper {
       .comment {
         background-color: #fff;

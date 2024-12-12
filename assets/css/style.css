@@ -91,6 +91,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: opacity 0.6s ease;
   display: none;
 }
 .modal-overlay .modal-wrapper {
@@ -146,7 +147,7 @@ body {
 .container .comment-reply-wrapper {
   max-width: 100%;
   margin-bottom: 20px;
-  transition: opacity 2s ease;
+  transition: opacity 0.6s ease;
 }
 .container .comment-reply-wrapper .comment-wrapper .comment {
   background-color: #fff;
