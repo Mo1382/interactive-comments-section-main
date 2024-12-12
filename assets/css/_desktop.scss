@@ -6,6 +6,8 @@ body {
 // Styles for sections in different parts
 .add-comment-field {
   flex-grow: 1;
+  // Preventing side elements to get smaller
+  flex-shrink: 1000;
   margin: 0 16px;
   min-height: 96px;
   border-radius: 8px;
@@ -104,6 +106,7 @@ body {
   .comment-reply-wrapper {
     max-width: 100%;
     margin-bottom: 20px;
+    transition: opacity 2s ease;
     .comment-wrapper {
       .comment {
         background-color: #fff;
@@ -144,6 +147,7 @@ body {
           }
         }
         .comment-detail {
+          width: 100%;
           .comment-detail-header {
             margin-bottom: 12px;
             display: flex;

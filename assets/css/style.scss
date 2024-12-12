@@ -4,3 +4,13 @@
 @import "_desktop.scss";
 @import "_tablet.scss";
 @import "_mobile.scss";
+
+// Utilities
+.hide-el {
+  display: none !important;
+  opacity: 0 !important;
+}
+.show-el {
+  display: block !important;
+  opacity: 1 !important;
+}

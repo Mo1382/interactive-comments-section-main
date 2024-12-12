@@ -18,3 +18,7 @@ textarea {
   resize: none;
   field-sizing: content;
 }
+p,
+textarea {
+  word-break: break-all;
+}

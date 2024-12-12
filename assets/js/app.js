@@ -5,10 +5,12 @@ const storage = localStorage.getItem("appData");
 let isScreenDesktop;
 
 // DOM Elements
+const containerEl = document.querySelector(".container");
 const addCommentEl = document.querySelector(
   ".container > .add-comment-wrapper"
 );
 const commentReplyWrapperEl = document.querySelector(".comment-reply-wrapper");
+const sendBtn = document.querySelector("#send-btn");
 
 // Functions
 /**
@@ -21,6 +23,15 @@ const getData = async function (url) {
   const res = await fetch(url);
   const data = await res.json();
   return data;
+};
+
+/**
+ * Saves the provided data to the browser's local storage under the key "appData".
+ *
+ * @param {any} data - The data to be saved to local storage.
+ */
+const saveToLocalStorage = function (data) {
+  localStorage.setItem("appData", JSON.stringify(data));
 };
 
 /**
@@ -123,16 +134,53 @@ const timeToRender = function (createdDateStr) {
 };
 
 /**
- * Renders a comment element with the provided comment object and inserts it before the specified next element.
+ * Renders a comment element with the provided comment object, comment number, and next element.
  *
- * @param {Object} commentObj - The comment object containing the data to be rendered.
- * @param {number} commentNum - The numerical identifier for the comment.
- * @param {HTMLElement} nextEL - The next element before which the comment should be inserted.
+ * @param {Object} commentObj - The comment object containing the data to render.
+ * @param {number} commentNum - The number of the comment.
+ * @param {HTMLElement} nextEL - The next element to insert the comment element before.
+ * @param {boolean} [isHidden=false] - Whether the comment element should be initially hidden.
  */
-const renderCommentEl = function (commentObj, commentNum, nextEL) {
+const renderCommentEl = function (
+  commentObj,
+  commentNum,
+  nextEL,
+  isHidden = false,
+  isCurrentUser
+) {
+  const btnsHTML = isCurrentUser
+    ? `<div class="comment-btn delete-btn">
+<svg width="12" height="14" xmlns="http://www.w3.org/2000/svg">
+    <path
+    d="M1.167 12.448c0 .854.7 1.552 1.555 1.552h6.222c.856 0 1.556-.698 1.556-1.552V3.5H1.167v8.948Zm10.5-11.281H8.75L7.773 0h-3.88l-.976 1.167H0v1.166h11.667V1.167Z"
+    fill="#ED6368" />
+</svg>
+<span>Delete</span>
+</div>
+<div class="comment-btn edit-btn">
+<svg width="14" height="14" xmlns="http://www.w3.org/2000/svg">
+    <path
+    d="M13.479 2.872 11.08.474a1.75 1.75 0 0 0-2.327-.06L.879 8.287a1.75 1.75 0 0 0-.5 1.06l-.375 3.648a.875.875 0 0 0 .875.954h.078l3.65-.333c.399-.04.773-.216 1.058-.499l7.875-7.875a1.68 1.68 0 0 0-.061-2.371Zm-2.975 2.923L8.159 3.449 9.865 1.7l2.389 2.39-1.75 1.706Z"
+    fill="#5357B6" />
+</svg>
+<span>Edit</span>
+</div>`
+    : `<div class="comment-btn reply-btn">
+            <svg width="14" height="13" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M.227 4.316 5.04.16a.657.657 0 0 1 1.085.497v2.189c4.392.05 7.875.93 7.875 5.093 0 1.68-1.082 3.344-2.279 4.214-.373.272-.905-.07-.767-.51 1.24-3.964-.588-5.017-4.829-5.078v2.404c0 .566-.664.86-1.085.496L.227 5.31a.657.657 0 0 1 0-.993Z"
+                fill="#5357B6" />
+            </svg>
+            <span>Reply</span>
+        </div>`;
+
   const commentHTML = `
-        <div class="comment-reply-wrapper" data-counter="${commentNum}">
-      <div class="comment-wrapper">
+        <div class="comment-reply-wrapper" style="${
+          isHidden ? "opacity:0" : ""
+        }">
+      <div class="comment-wrapper ${
+        isCurrentUser ? "active-user-comment" : ""
+      }" data-id="${commentObj.id}">
         <div class="comment">
           <div class="comment-upvote-downvote">
             <div class="upvote-icon">
@@ -166,14 +214,7 @@ const renderCommentEl = function (commentObj, commentNum, nextEL) {
                 )}</div>
               </div>
               <div class="comment-detail-header-right">
-                <div class="comment-btn reply-btn">
-                  <svg width="14" height="13" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      d="M.227 4.316 5.04.16a.657.657 0 0 1 1.085.497v2.189c4.392.05 7.875.93 7.875 5.093 0 1.68-1.082 3.344-2.279 4.214-.373.272-.905-.07-.767-.51 1.24-3.964-.588-5.017-4.829-5.078v2.404c0 .566-.664.86-1.085.496L.227 5.31a.657.657 0 0 1 0-.993Z"
-                      fill="#5357B6" />
-                  </svg>
-                  <span>Reply</span>
-                </div>
+                ${btnsHTML}
               </div>
             </div>
             <div class="comment-detail-body">
@@ -198,7 +239,9 @@ const renderCommentEl = function (commentObj, commentNum, nextEL) {
  * @param {HTMLElement} parentEL - The parent element to append the reply element to.
  */
 const renderReplyEl = function (replyObj, parentEL) {
-  const replyHTML = `<div class="comment-wrapper reply-comment-wrapper">
+  const replyHTML = `<div data-id="${
+    replyObj.id
+  }" class="comment-wrapper reply-comment-wrapper">
           <div class="comment">
             <div class="comment-upvote-downvote">
               <div class="upvote-icon">
@@ -270,30 +313,97 @@ const renderReplyEl = function (replyObj, parentEL) {
  * @param {number} commentObjs[].score - The score (upvotes - downvotes) of the comment.
  * @param {Object[]} commentObjs[].replies - An array of reply objects for the comment.
  */
-const renderCommentsReplies = function (commentObjs) {
-  commentObjs.forEach(commentObj => {
-    let commentCounnter = 0;
+const renderCommentsReplies = function (appData) {
+  const commentObjs = appData.comments;
+  let commentCounter = 0;
 
-    renderCommentEl(commentObj, commentCounnter, addCommentEl);
+  commentObjs.forEach(commentObj => {
+    const isCurrentUser =
+      commentObj.user.username === appState.currentUser.username;
+
+    renderCommentEl(
+      commentObj,
+      commentCounter,
+      addCommentEl,
+      undefined,
+      isCurrentUser
+    );
 
     // Checking if comment has any reply or not
     if (!hasCommentAnyReply(commentObj)) {
-      commentCounnter++;
+      commentCounter++;
       return;
     }
 
     const commentReplyWrapperEl = document.querySelector(
-      `.comment-reply-wrapper[data-counter="${commentCounnter}"]`
-    );
+      `.comment-wrapper[data-id="${commentObj.id}"]`
+    ).parentElement;
     const repliesWrapperEl = document.createElement("div");
     repliesWrapperEl.classList.add("reply-wrapper");
     commentReplyWrapperEl.append(repliesWrapperEl);
 
     commentObj.replies.forEach(replyObj => {
       renderReplyEl(replyObj, repliesWrapperEl);
-
-      commentCounnter++;
     });
+    commentCounter++;
+  });
+};
+
+/**
+ * Changes the layout of the comments for mobile devices by moving the comment buttons and upvote/downvote elements to the footer of the comment detail section.
+ *
+ * @param {HTMLElement[]} commentEls - An array of HTML elements representing the comments.
+ */
+const changeCommentsForMobiles = function (commentEls) {
+  commentEls.forEach(el => {
+    const commentBtnEls = el.querySelectorAll(".comment-btn");
+    const upvoteDownvoteEl = el.querySelector(".comment-upvote-downvote");
+    const commentDetailEl = el.querySelector(".comment-detail");
+
+    // Creating a footer element to hold the comment buttons and upvote/downvote elements
+    const detailFooterEl = document.createElement("div");
+    detailFooterEl.innerHTML = "<div class='comment-btns'></div>";
+
+    const btnsWrapper = detailFooterEl.querySelector(".comment-btns");
+
+    detailFooterEl.classList.add("comment-detail-footer");
+    commentDetailEl.append(detailFooterEl);
+
+    // Moving the upvote/downvote elements to the footer
+    detailFooterEl.prepend(upvoteDownvoteEl);
+
+    // Moving comment buttons to the footer
+    commentBtnEls.forEach(btn => {
+      btnsWrapper.append(btn);
+    });
+  });
+};
+
+/**
+ * Changes the layout of the comments for desktop devices by moving the comment buttons and upvote/downvote elements to the header of the comment detail section.
+ *
+ * @param {HTMLElement[]} commentEls - An array of HTML elements representing the comments.
+ */
+const changeCommentsForDesktop = function (commentEls) {
+  commentEls.forEach(el => {
+    const commentBtnEls = el.querySelectorAll(".comment-btn");
+    const upvoteDownvoteEl = el.querySelector(".comment-upvote-downvote");
+    const commentEl = el.querySelector(".comment");
+    const commentHeaderRightEl = el.querySelector(
+      ".comment-detail-header-right"
+    );
+    const footerEl = el.querySelector(".comment-detail-footer");
+
+    // Moving the upvote/downvote elements to the left of the comment
+    commentEl.prepend(upvoteDownvoteEl);
+
+    // Moving comment buttons to the right of the header
+    commentBtnEls.forEach(btn => {
+      commentHeaderRightEl.append(btn);
+    });
+
+    // Removing the footer element
+    footerEl.remove();
   });
 };
 
@@ -314,27 +424,8 @@ const setLayout = function () {
 
   const commentWrapperEls = document.querySelectorAll(".comment-wrapper");
 
-  commentWrapperEls.forEach(el => {
-    const commentBtnEls = el.querySelectorAll(".comment-btn");
-    const upvoteDownvoteEl = el.querySelector(".comment-upvote-downvote");
-    const commentDetailEl = el.querySelector(".comment-detail");
-
-    const detailFooterEl = document.createElement("div");
-    detailFooterEl.innerHTML = "<div class='comment-btns'></div>";
-
-    const btnsWrapper = detailFooterEl.querySelector(".comment-btns");
-
-    detailFooterEl.classList.add("comment-detail-footer");
-    commentDetailEl.append(detailFooterEl);
-
-    detailFooterEl.prepend(upvoteDownvoteEl);
-    commentBtnEls.forEach(btn => {
-      btnsWrapper.append(btn);
-    });
-  });
+  changeCommentsForMobiles(commentWrapperEls);
 };
-
-// const init = function () {};
 
 const appState = storage
   ? JSON.parse(storage)
@@ -342,16 +433,194 @@ const appState = storage
 
 // console.log(appState);
 
-// Setting isReplying to false for all comments and replies
-setPropFalse(appState.comments, "isReplying");
-// console.log(appState);
+/**
+ * Initializes the application state and renders the comments and replies.
+ *
+ * This function is responsible for the following tasks:
+ * - Sets the `isReplying` property to `false` for all comments and replies in the `appData.comments` array.
+ * - Sets the `isEditing` property to `false` for all user comments and replies in the `appData.comments` array.
+ * - Calls the `renderCommentsReplies` function to render the comments and replies.
+ * - Calls the `setLayout` function to set the layout of the comment section based on the screen width.
+ *
+ * @param {Object} appData - The application data object containing the comments and replies.
+ */
+const init = function (appData) {
+  // Setting isReplying to false for all comments and replies
+  setPropFalse(appData.comments, "isReplying");
+  // console.log(appData);
 
-// console.log(filterUserCommentsReplies(appState));
+  // console.log(filterUserCommentsReplies(appData));
 
-setPropFalse(filterUserCommentsReplies(appState).flat(), "isEditing");
+  setPropFalse(filterUserCommentsReplies(appData).flat(), "isEditing");
 
-// console.log(filterUserCommentsReplies(appState));
+  // console.log(filterUserCommentsReplies(appData));
 
-renderCommentsReplies(appState.comments);
+  renderCommentsReplies(appData);
 
-setLayout();
+  setLayout();
+};
+
+init(appState);
+
+/**
+ * Creates a new comment object with the provided content and adds it to the application state.
+ *
+ * @param {Object} appData - The application data object containing the comments and replies.
+ * @param {string} commentContent - The content of the new comment.
+ * @returns {Object} The newly created comment object.
+ */
+const createCommentObj = function (appData, commentContent) {
+  // Calculating the comment and reply num for new comment id
+  const commentsNum = appData.comments.length;
+  const repliesNum = appData.comments.reduce((acc, comment) => {
+    return acc + comment.replies.length;
+  }, 0);
+  //   console.log(commentsNum, repliesNum);
+
+  const newCommentObj = {
+    id: commentsNum + repliesNum + 1,
+    content: commentContent,
+    createdAt: new Date().toISOString(),
+    score: 0,
+    user: { ...appData.currentUser },
+    replies: [],
+  };
+  //   console.log(newCommentObj);
+
+  appData.comments.push(newCommentObj);
+
+  return newCommentObj;
+};
+
+/**
+ * Shows the newly added comment by setting its opacity to 1 after a short delay.
+ *
+ * @param {HTMLElement[]} commentWrapperEls - An array of comment wrapper elements.
+ */
+const showAddedComment = function (commentWrapperEls) {
+  // Set the opacity to 1 after the element is added to the DOM
+  const addedCommentEl = [...commentWrapperEls].at(-1);
+
+  // Set the opacity to 1 to create an animation
+  // Use a timeout to ensure the transition is triggered after the element is added to the DOM
+  setTimeout(() => {
+    addedCommentEl.style.opacity = 1;
+  }, 0);
+};
+
+/**
+ * Finds the comment or reply object from the provided array of comment objects based on the element's data-id attribute.
+ *
+ * @param {Object[]} commentObjs - An array of comment objects.
+ * @param {HTMLElement} el - The HTML element associated with the comment or reply.
+ * @returns {Object|undefined} The comment or reply object, or undefined if not found.
+ */
+const findObjFromEl = function (commentObjs, el) {
+  const elId = +el.dataset.id;
+  //   console.log(elId);
+
+  const commentEditing = commentObjs.find(commentObj => {
+    return commentObj.id === elId;
+  });
+
+  if (commentEditing) return commentEditing;
+
+  // Select all replies and then check which one matches the id
+  const replyEditing = commentObjs
+    .flatMap(commentObj => {
+      return commentObj.replies;
+    })
+    .find(reply => {
+      return reply.id === elId;
+    });
+
+  return replyEditing;
+};
+
+// Event handlers
+window.addEventListener("resize", function () {
+  const screenWidth = window.innerWidth;
+  const commentWrapperEls = document.querySelectorAll(".comment-wrapper");
+
+  if (screenWidth <= 794 && isScreenDesktop) {
+    isScreenDesktop = false;
+
+    changeCommentsForMobiles(commentWrapperEls);
+  }
+
+  if (screenWidth > 794 && !isScreenDesktop) {
+    isScreenDesktop = true;
+
+    changeCommentsForDesktop(commentWrapperEls);
+  }
+});
+
+sendBtn.addEventListener("click", function (e) {
+  e.preventDefault();
+  const textareaContent = e.target.previousElementSibling.value;
+
+  if (textareaContent === "") return;
+
+  const newCommentObj = createCommentObj(appState, textareaContent);
+  // console.log(appState.comments);
+
+  // Render the new comment with opacity : 0
+  renderCommentEl(
+    newCommentObj,
+    appState.comments.length - 1,
+    addCommentEl,
+    true,
+    true
+  );
+
+  showAddedComment(document.querySelectorAll(".comment-reply-wrapper"));
+
+  saveToLocalStorage(appState);
+});
+
+// Event delegation for edit btns
+containerEl.addEventListener("click", function (e) {
+  const clickedEl = e.target;
+
+  // Matching strategy
+  if (!clickedEl.closest(".edit-btn")) return;
+  //   console.log("matching strategy works");
+
+  // Finding the revelant comment el and obj of edit btn clicked
+  const revelantEl = clickedEl.closest(".comment-wrapper");
+  const revelantObj = findObjFromEl(appState.comments, revelantEl);
+  //   console.log(revelantObj);
+
+  // Avoiding next instructions if the comment is already being edited
+  if (revelantObj.isEditing) return;
+
+  revelantObj.isEditing = true;
+
+  // Elemensts selection to change comment layout for editing it
+  const commentBodyEl = revelantEl.querySelector(".comment-detail-body");
+  const commentDescEl = revelantEl.querySelector(".comment-detail-body p");
+  const commentEl = revelantEl.querySelector(".comment");
+  const commentDetailEl = revelantEl.querySelector(".comment-detail");
+
+  commentEl.classList.add("comment-edit");
+
+  commentDescEl.remove();
+
+  const editFieldHTML = `
+<textarea class="add-comment-field" placeholder="Add a comment...">
+${revelantObj.replyingTo ? "@" + revelantObj.replyingTo : ""}${
+    revelantObj.content
+  }
+</textarea>
+  `;
+
+  commentBodyEl.insertAdjacentHTML("afterbegin", editFieldHTML);
+
+  const updateBtnHTML = `
+<div class="comment-update">
+    <button class="primary-btn update-btn">UPDATE</button>
+</div>
+  `;
+
+  commentDetailEl.insertAdjacentHTML("beforeend", updateBtnHTML);
+});
