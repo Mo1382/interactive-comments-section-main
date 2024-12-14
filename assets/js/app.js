@@ -6,7 +6,7 @@ const storage = localStorage.getItem("appData");
 let isScreenDesktop;
 // Declaring here to be accessible in deleteBtn element event handler
 let deletingEl;
-let infoForReplyConfirm;
+const infoForReplyConfirm = [];
 
 // DOM Elements
 const containerEl = document.querySelector(".container");
@@ -508,11 +508,19 @@ const createCommentReplyObj = function (
   replyToObj = undefined
 ) {
   // Calculating the comment and reply num for new comment id
-  const commentsNum = appData.comments.length;
-  const repliesNum = appData.comments.reduce((acc, comment) => {
-    return acc + comment.replies.length;
-  }, 0);
+  // Does not work all the time (having comments or replies with the same id)
+  // const commentsNum = appData.comments.length;
+  // const repliesNum = appData.comments.reduce((acc, comment) => {
+  //   return acc + comment.replies.length;
+  // }, 0);
   //   console.log(commentsNum, repliesNum);
+
+  const allReplies = appState.comments.flatMap(comment => comment.replies);
+  const allCommantsReplies = [...appState.comments, ...allReplies];
+
+  const maxId = allCommantsReplies.reduce((max, obj) => {
+    return obj.id > max ? obj.id : max;
+  }, allCommantsReplies[0].id);
 
   const commentReplyDiff = new Map();
   if (isComment) commentReplyDiff.set("replies", []);
@@ -525,7 +533,8 @@ const createCommentReplyObj = function (
       content.replace(new RegExp(`@${replyToObj.user.username}\\.?`), "");
 
   const newObj = {
-    id: commentsNum + repliesNum + 1,
+    // id: commentsNum + repliesNum + 1,
+    id: maxId + 1,
     content: newObjContent,
     createdAt: new Date().toISOString(),
     score: 0,
@@ -657,6 +666,21 @@ const isReplyFieldEmpty = function (fieldEl, replyToUsername) {
   );
 };
 
+/**
+ * Finds the HTML element that corresponds to the provided object.
+ *
+ * @param {HTMLElement[]} allEls - An array of all the HTML elements to search through.
+ * @param {Object} obj - The object to find the corresponding HTML element for.
+ * @returns {HTMLElement} The HTML element that corresponds to the provided object, or `undefined` if no matching element is found.
+ */
+const findElFromObj = function (allEls, obj) {
+  const objId = obj.id;
+
+  const foundEL = allEls.find(el => +el.dataset.id === objId);
+
+  return foundEL;
+};
+
 // Event handlers
 window.addEventListener("resize", function () {
   const screenWidth = window.innerWidth;
@@ -769,15 +793,15 @@ containerEl.addEventListener("click", function (e) {
 
   textFieldEl.remove();
 
-  const commentDescHTML = `
+  const descHTML = `
 <p>
-${revelantObj.replyingTo ? "@" + revelantObj.replyingTo : ""}${
-    revelantObj.content
-  }
+<span class="replied-username">${
+    revelantObj.replyingTo ? "@" + revelantObj.replyingTo : ""
+  }</span> ${revelantObj.content}
 </p>
   `;
 
-  commentBodyEl.insertAdjacentHTML("afterbegin", commentDescHTML);
+  commentBodyEl.insertAdjacentHTML("afterbegin", descHTML);
 
   commentEl.classList.remove("comment-edit");
 
@@ -900,13 +924,10 @@ containerEl.addEventListener("click", function (e) {
    *   - addCommentFieldEl: The textarea element for adding a new reply comment.
    */
   const exportInfoForReplyConfirm = function () {
-    return {
-      revelantEl,
-      revelantObj,
-    };
+    return [revelantEl, revelantObj];
   };
 
-  infoForReplyConfirm = exportInfoForReplyConfirm();
+  infoForReplyConfirm.push(exportInfoForReplyConfirm());
   // console.log(infoForReplyConfirm);
 });
 
@@ -918,8 +939,14 @@ containerEl.addEventListener("click", function (e) {
   // Matching strategy
   if (!clicked.classList.contains("confirm-reply-btn")) return;
 
+  const updateRelevantEl = clicked.closest(".comment-wrapper");
+
+  const selectedInfoForReplyConfirm = infoForReplyConfirm.find(
+    ([relevantEl]) => relevantEl === updateRelevantEl
+  );
+
   // Data needed for the reply confirmation functionality
-  const { revelantEl, revelantObj } = infoForReplyConfirm;
+  const [revelantEl, revelantObj] = selectedInfoForReplyConfirm;
   const addReplyEl = revelantEl.querySelector(".add-comment-wrapper");
   const addRelpyFieldEl = revelantEl.querySelector(".add-comment-field");
   const replyText = revelantEl.querySelector(".add-comment-field").value;
@@ -957,5 +984,69 @@ containerEl.addEventListener("click", function (e) {
     saveToLocalStorage(appState);
 
     revelantObj.isReplying = false;
+  }
+});
+
+// Event listener to close reply and edit field when user clicks outside of them
+document.body.addEventListener("click", function (e) {
+  const allCommentReplyEls = [...document.querySelectorAll(".comment-wrapper")];
+
+  const allReplies = appState.comments.flatMap(comment => comment.replies);
+  const allCommantsReplies = [...appState.comments, ...allReplies];
+  // console.log(allCommantsReplies);
+
+  const replyingObjs = allCommantsReplies.filter(comment => comment.isReplying);
+
+  const editingObjs = allCommantsReplies.filter(comment => comment.isEditing);
+  // console.log(replyingObjs, editingObjs);
+
+  const replyingEls = replyingObjs.map(obj =>
+    findElFromObj(allCommentReplyEls, obj)
+  );
+
+  const editingEls = editingObjs.map(obj =>
+    findElFromObj(allCommentReplyEls, obj)
+  );
+  // console.log(replyingEls, editingEls);
+
+  const clickedWrapper = e.target.closest(".comment-wrapper");
+
+  if (replyingObjs.length > 0 && !replyingEls.includes(clickedWrapper)) {
+    // Executing when some reply fields are opened & user clicks outside of reply fields.
+    replyingEls.forEach(el =>
+      el.querySelector(".add-comment-wrapper").remove()
+    );
+
+    replyingObjs.forEach(obj => (obj.isReplying = false));
+  }
+  if (editingObjs.length > 0 && !editingEls.includes(clickedWrapper)) {
+    // Executing when some edit fields are opened & user clicks outside of edit fields.
+    editingEls.forEach((el, i) => {
+      const obj = editingObjs[i];
+
+      const editField = el.querySelector(".add-comment-field");
+      const updateBtn = el.querySelector(".comment-update");
+      const descWrapperEl = el.querySelector(".comment-detail-body");
+
+      // console.log(obj, el);
+      // console.log(editField);
+
+      // Removing all edit fields and update btns in page
+      editField.remove();
+      updateBtn.remove();
+
+      const descHTML = `
+<p>
+<span class="replied-username">${
+        obj.replyingTo ? "@" + obj.replyingTo : ""
+      }</span> ${obj.content}
+</p>
+      `;
+
+      descWrapperEl.insertAdjacentHTML("afterbegin", descHTML);
+
+      obj.isEditing = false;
+      // console.log(editingObjs, editingEls);
+    });
   }
 });
