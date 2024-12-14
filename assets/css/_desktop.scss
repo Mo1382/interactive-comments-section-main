@@ -255,12 +255,15 @@ body {
         border-radius: 8px;
         background-color: rgba(222, 222, 224, 0.94);
       }
-      .reply-comment-wrapper .comment {
-        .comment-detail .comment-detail-body p {
-          padding-right: 8px;
-          .replied-username {
-            font-weight: $medium-weight;
-            color: $primary-moderate-blue;
+      .reply-comment-wrapper {
+        transition: opacity 0.6s ease;
+        .comment {
+          .comment-detail .comment-detail-body p {
+            padding-right: 8px;
+            .replied-username {
+              font-weight: $medium-weight;
+              color: $primary-moderate-blue;
+            }
           }
         }
       }

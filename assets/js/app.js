@@ -2,9 +2,11 @@
 // Data
 const storage = localStorage.getItem("appData");
 // console.log(storage);
+
 let isScreenDesktop;
 // Declaring here to be accessible in deleteBtn element event handler
 let deletingEl;
+let infoForReplyConfirm;
 
 // DOM Elements
 const containerEl = document.querySelector(".container");
@@ -27,9 +29,15 @@ const modalCancelBtn = document.querySelector(".cancel-modal-btn");
  * @returns {Promise<any>} - A Promise with data form the URL..
  */
 const getData = async function (url) {
-  const res = await fetch(url);
-  const data = await res.json();
-  return data;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    alert(
+      "Something went wrong. Please check your internet connection and reload the page."
+    );
+  }
 };
 
 /**
@@ -150,7 +158,6 @@ const timeToRender = function (createdDateStr) {
  */
 const renderCommentEl = function (
   commentObj,
-  commentNum,
   nextEL,
   isHidden = false,
   isCurrentUser
@@ -245,10 +252,43 @@ const renderCommentEl = function (
  * @param {Object} replyObj - The reply object containing the data to render.
  * @param {HTMLElement} parentEL - The parent element to append the reply element to.
  */
-const renderReplyEl = function (replyObj, parentEL) {
+const renderReplyEl = function (
+  replyObj,
+  parentEL,
+  isHidden = false,
+  isCurrentUser
+) {
+  const btnsHTML = isCurrentUser
+    ? `<div class="comment-btn delete-btn">
+<svg width="12" height="14" xmlns="http://www.w3.org/2000/svg">
+    <path
+    d="M1.167 12.448c0 .854.7 1.552 1.555 1.552h6.222c.856 0 1.556-.698 1.556-1.552V3.5H1.167v8.948Zm10.5-11.281H8.75L7.773 0h-3.88l-.976 1.167H0v1.166h11.667V1.167Z"
+    fill="#ED6368" />
+</svg>
+<span>Delete</span>
+</div>
+<div class="comment-btn edit-btn">
+<svg width="14" height="14" xmlns="http://www.w3.org/2000/svg">
+    <path
+    d="M13.479 2.872 11.08.474a1.75 1.75 0 0 0-2.327-.06L.879 8.287a1.75 1.75 0 0 0-.5 1.06l-.375 3.648a.875.875 0 0 0 .875.954h.078l3.65-.333c.399-.04.773-.216 1.058-.499l7.875-7.875a1.68 1.68 0 0 0-.061-2.371Zm-2.975 2.923L8.159 3.449 9.865 1.7l2.389 2.39-1.75 1.706Z"
+    fill="#5357B6" />
+</svg>
+<span>Edit</span>
+</div>`
+    : `<div class="comment-btn reply-btn">
+            <svg width="14" height="13" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M.227 4.316 5.04.16a.657.657 0 0 1 1.085.497v2.189c4.392.05 7.875.93 7.875 5.093 0 1.68-1.082 3.344-2.279 4.214-.373.272-.905-.07-.767-.51 1.24-3.964-.588-5.017-4.829-5.078v2.404c0 .566-.664.86-1.085.496L.227 5.31a.657.657 0 0 1 0-.993Z"
+                fill="#5357B6" />
+            </svg>
+            <span>Reply</span>
+        </div>`;
+
   const replyHTML = `<div data-id="${
     replyObj.id
-  }" class="comment-wrapper reply-comment-wrapper">
+  }" class="comment-wrapper reply-comment-wrapper ${
+    isCurrentUser ? "active-user-comment" : ""
+  }" style="${isHidden ? "opacity:0" : ""}">
           <div class="comment">
             <div class="comment-upvote-downvote">
               <div class="upvote-icon">
@@ -282,14 +322,7 @@ const renderReplyEl = function (replyObj, parentEL) {
                   )}</div>
                 </div>
                 <div class="comment-detail-header-right">
-                  <div class="comment-btn reply-btn">
-                    <svg width="14" height="13" xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        d="M.227 4.316 5.04.16a.657.657 0 0 1 1.085.497v2.189c4.392.05 7.875.93 7.875 5.093 0 1.68-1.082 3.344-2.279 4.214-.373.272-.905-.07-.767-.51 1.24-3.964-.588-5.017-4.829-5.078v2.404c0 .566-.664.86-1.085.496L.227 5.31a.657.657 0 0 1 0-.993Z"
-                        fill="#5357B6" />
-                    </svg>
-                    <span>Reply</span>
-                  </div>
+                  ${btnsHTML}
                 </div>
               </div>
               <div class="comment-detail-body">
@@ -322,25 +355,15 @@ const renderReplyEl = function (replyObj, parentEL) {
  */
 const renderCommentsReplies = function (appData) {
   const commentObjs = appData.comments;
-  let commentCounter = 0;
 
   commentObjs.forEach(commentObj => {
     const isCurrentUser =
       commentObj.user.username === appState.currentUser.username;
 
-    renderCommentEl(
-      commentObj,
-      commentCounter,
-      addCommentEl,
-      undefined,
-      isCurrentUser
-    );
+    renderCommentEl(commentObj, addCommentEl, undefined, isCurrentUser);
 
     // Checking if comment has any reply or not
-    if (!hasCommentAnyReply(commentObj)) {
-      commentCounter++;
-      return;
-    }
+    if (!hasCommentAnyReply(commentObj)) return;
 
     const commentReplyWrapperEl = document.querySelector(
       `.comment-wrapper[data-id="${commentObj.id}"]`
@@ -350,9 +373,11 @@ const renderCommentsReplies = function (appData) {
     commentReplyWrapperEl.append(repliesWrapperEl);
 
     commentObj.replies.forEach(replyObj => {
-      renderReplyEl(replyObj, repliesWrapperEl);
+      const isCurrentUser =
+        replyObj.user.username === appState.currentUser.username;
+
+      renderReplyEl(replyObj, repliesWrapperEl, undefined, isCurrentUser);
     });
-    commentCounter++;
   });
 };
 
@@ -476,7 +501,12 @@ init(appState);
  * @param {string} commentContent - The content of the new comment.
  * @returns {Object} The newly created comment object.
  */
-const createCommentObj = function (appData, commentContent) {
+const createCommentReplyObj = function (
+  appData,
+  content,
+  isComment = true,
+  replyToObj = undefined
+) {
   // Calculating the comment and reply num for new comment id
   const commentsNum = appData.comments.length;
   const repliesNum = appData.comments.reduce((acc, comment) => {
@@ -484,19 +514,39 @@ const createCommentObj = function (appData, commentContent) {
   }, 0);
   //   console.log(commentsNum, repliesNum);
 
-  const newCommentObj = {
+  const commentReplyDiff = new Map();
+  if (isComment) commentReplyDiff.set("replies", []);
+  else commentReplyDiff.set("replyingTo", replyToObj.user.username);
+  const diffToObject = Object.fromEntries(commentReplyDiff);
+
+  const newObjContent = isComment
+    ? content
+    : // Removing @username(.) of content to save in Object
+      content.replace(new RegExp(`@${replyToObj.user.username}\\.?`), "");
+
+  const newObj = {
     id: commentsNum + repliesNum + 1,
-    content: commentContent,
+    content: newObjContent,
     createdAt: new Date().toISOString(),
     score: 0,
     user: { ...appData.currentUser },
-    replies: [],
+    ...diffToObject,
   };
-  //   console.log(newCommentObj);
+  //   console.log(newObj);
 
-  appData.comments.push(newCommentObj);
+  if (isComment) appData.comments.push(newObj);
+  // If we have a reply and it's a reply to a comment
+  else if (!replyToObj.replyingTo) replyToObj.replies.push(newObj);
+  // If we have a reply and it's a reply to a reply
+  else {
+    const commentToAddReply = appData.comments.find(comment =>
+      comment.replies.includes(replyToObj)
+    );
 
-  return newCommentObj;
+    commentToAddReply.replies.push(newObj);
+  }
+
+  return newObj;
 };
 
 /**
@@ -504,14 +554,14 @@ const createCommentObj = function (appData, commentContent) {
  *
  * @param {HTMLElement[]} commentWrapperEls - An array of comment wrapper elements.
  */
-const showAddedComment = function (commentWrapperEls) {
+const showAddedCommentReply = function (allEls) {
   // Set the opacity to 1 after the element is added to the DOM
-  const addedCommentEl = [...commentWrapperEls].at(-1);
+  const addedCommentReplyEl = [...allEls].at(-1);
 
   // Set the opacity to 1 to create an animation
   // Use a timeout to ensure the transition is triggered after the element is added to the DOM
   setTimeout(() => {
-    addedCommentEl.style.opacity = 1;
+    addedCommentReplyEl.style.opacity = 1;
   }, 0);
 };
 
@@ -524,24 +574,24 @@ const showAddedComment = function (commentWrapperEls) {
  */
 const findObjFromEl = function (commentObjs, el) {
   const elId = +el.dataset.id;
-  //   console.log(elId);
+  // console.log(elId);
 
-  const commentEditing = commentObjs.find(commentObj => {
+  const activeComment = commentObjs.find(commentObj => {
     return commentObj.id === elId;
   });
 
-  if (commentEditing) return commentEditing;
+  // console.log(activeComment);
+
+  if (activeComment) return activeComment;
 
   // Select all replies and then check which one matches the id
-  const replyEditing = commentObjs
-    .flatMap(commentObj => {
-      return commentObj.replies;
-    })
-    .find(reply => {
-      return reply.id === elId;
-    });
+  const activeReply = commentObjs
+    .flatMap(commentObj => commentObj.replies)
+    .find(reply => reply.id === elId);
 
-  return replyEditing;
+  // console.log(activeReply);
+
+  return activeReply;
 };
 
 /**
@@ -590,6 +640,23 @@ const closeModal = function (modalWrapperEl) {
   }, elHideDurationMs);
 };
 
+/**
+ * Checks if the reply field is empty or contains only the reply-to username.
+ *
+ * @param {HTMLElement} fieldEl - The HTML element representing the reply field.
+ * @param {string} replyToUsername - The username of the person the reply is being made to.
+ * @returns {boolean} `true` if the reply field is empty or contains only the reply-to username, `false` otherwise.
+ */
+const isReplyFieldEmpty = function (fieldEl, replyToUsername) {
+  const replyText = fieldEl.value;
+
+  return (
+    replyText === "" ||
+    replyText === `@${replyToUsername}.` ||
+    replyText === `@${replyToUsername}`
+  );
+};
+
 // Event handlers
 window.addEventListener("resize", function () {
   const screenWidth = window.innerWidth;
@@ -614,19 +681,13 @@ sendBtn.addEventListener("click", function (e) {
 
   if (textareaContent === "") return;
 
-  const newCommentObj = createCommentObj(appState, textareaContent);
+  const newCommentObj = createCommentReplyObj(appState, textareaContent);
   // console.log(appState.comments);
 
   // Render the new comment with opacity : 0
-  renderCommentEl(
-    newCommentObj,
-    appState.comments.length - 1,
-    addCommentEl,
-    true,
-    true
-  );
+  renderCommentEl(newCommentObj, addCommentEl, true, true);
 
-  showAddedComment(document.querySelectorAll(".comment-reply-wrapper"));
+  showAddedCommentReply(document.querySelectorAll(".comment-reply-wrapper"));
 
   saveToLocalStorage(appState);
 
@@ -694,7 +755,9 @@ containerEl.addEventListener("click", function (e) {
   const revelantObj = findObjFromEl(appState.comments, revelantEl);
   //   console.log(revelantObj);
 
-  const newEditedContent = revelantEl.querySelector(".add-comment-field").value;
+  const newEditedContent = revelantEl
+    .querySelector(".add-comment-field")
+    .value.replace(new RegExp(`@${revelantObj.replyingTo}\\.?`), "");
 
   revelantObj.content = newEditedContent;
 
@@ -742,9 +805,26 @@ modalDeleteBtn.addEventListener("click", function (e) {
   const deletingObj = findObjFromEl(appState.comments, deletingEl);
   //   console.log(deletingObj);
 
-  // Deleting the commentObj from the appState
-  const deletingObjIndex = appState.comments.indexOf(deletingObj);
-  appState.comments.splice(deletingObjIndex, 1);
+  const isComment = deletingObj.replyingTo ? false : true;
+
+  if (isComment) {
+    // Executed when user wants to delete the comment
+    const deletingCommentObjIndex = appState.comments.indexOf(deletingObj);
+
+    // Deleting the commentObj from the appState
+    appState.comments.splice(deletingCommentObjIndex, 1);
+  } else {
+    // Executed when user wants to delete the reply
+    const repliesIncludeDeletingReply = appState.comments.find(commentObj =>
+      commentObj.replies.includes(deletingObj)
+    ).replies;
+
+    const deletingReplyObjIndex =
+      repliesIncludeDeletingReply.indexOf(deletingObj);
+
+    // Deleting the replyObj from the appState
+    repliesIncludeDeletingReply.splice(deletingReplyObjIndex, 1);
+  }
 
   const elHideDurationMs = calcElAnimeDuration(
     document.querySelector(".comment-reply-wrapper")
@@ -778,4 +858,104 @@ modalDeleteBtn.addEventListener("click", function (e) {
 
 modalCancelBtn.addEventListener("click", function (e) {
   closeModal(modalOverlayEl);
+});
+
+// Event delegation for reply btns
+containerEl.addEventListener("click", function (e) {
+  const clickedEl = e.target;
+
+  // Matching strategy
+  if (!clickedEl.closest(".reply-btn")) return;
+
+  const revelantEl = clickedEl.closest(".comment-wrapper");
+  const revelantObj = findObjFromEl(appState.comments, revelantEl);
+
+  if (revelantObj.isReplying) return;
+
+  revelantObj.isReplying = true;
+
+  const addReplyHTML = `
+<form class="add-comment-wrapper">
+  <div class="add-comment-thumb">
+    <img src="${appState.currentUser.image.webp.replace(
+      "/images",
+      "/assets/images"
+    )}" alt="">
+  </div>
+  <textarea class="add-comment-field" placeholder="Add a comment..."></textarea>
+  <button class="primary-btn confirm-reply-btn">REPLY</button>
+</form>
+  `;
+
+  revelantEl.insertAdjacentHTML("beforeend", addReplyHTML);
+
+  const addRelpyFieldEl = revelantEl.querySelector(".add-comment-field");
+  addRelpyFieldEl.value = `@${revelantObj.user.username}.`;
+
+  /**
+   * Exports an object containing relevant elements and objects for the reply confirmation functionality.
+   * @returns {Object} An object with the following properties:
+   *   - revelantEl: The closest `.comment-wrapper` element to the clicked reply button.
+   *   - revelantObj: The corresponding comment object from `appState.comments` for the `revelantEl`.
+   *   - addCommentFieldEl: The textarea element for adding a new reply comment.
+   */
+  const exportInfoForReplyConfirm = function () {
+    return {
+      revelantEl,
+      revelantObj,
+    };
+  };
+
+  infoForReplyConfirm = exportInfoForReplyConfirm();
+  // console.log(infoForReplyConfirm);
+});
+
+// Event delegation for reply confirm reply btns
+containerEl.addEventListener("click", function (e) {
+  e.preventDefault();
+  const clicked = e.target;
+
+  // Matching strategy
+  if (!clicked.classList.contains("confirm-reply-btn")) return;
+
+  // Data needed for the reply confirmation functionality
+  const { revelantEl, revelantObj } = infoForReplyConfirm;
+  const addReplyEl = revelantEl.querySelector(".add-comment-wrapper");
+  const addRelpyFieldEl = revelantEl.querySelector(".add-comment-field");
+  const replyText = revelantEl.querySelector(".add-comment-field").value;
+  const commentReplyWrapperEl = revelantEl.closest(".comment-reply-wrapper");
+  addReplyEl.remove();
+
+  if (isReplyFieldEmpty(addRelpyFieldEl, revelantObj.user.username)) {
+    // Executed when the user clicks "REPLY" btn without writing anything or just reply-to username.
+
+    revelantObj.isReplying = false;
+  } else {
+    // Executed when the user clicks "REPLY" btn and field isn't empty.
+    const newReplyObj = createCommentReplyObj(
+      appState,
+      replyText,
+      false,
+      revelantObj
+    );
+    // console.log(appState);
+
+    let replyWrapperEl = [...commentReplyWrapperEl.children].find(el =>
+      el.classList.contains("reply-wrapper")
+    );
+
+    if (!replyWrapperEl) {
+      replyWrapperEl = document.createElement("div");
+      replyWrapperEl.classList.add("reply-wrapper");
+      commentReplyWrapperEl.append(replyWrapperEl);
+    }
+
+    renderReplyEl(newReplyObj, replyWrapperEl, true, true);
+
+    showAddedCommentReply(replyWrapperEl.querySelectorAll(".comment-wrapper"));
+
+    saveToLocalStorage(appState);
+
+    revelantObj.isReplying = false;
+  }
 });
