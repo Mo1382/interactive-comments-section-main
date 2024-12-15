@@ -681,6 +681,27 @@ const findElFromObj = function (allEls, obj) {
   return foundEL;
 };
 
+/**
+ * Updates the score of a comment in the application state and the corresponding UI element.
+ *
+ * @param {boolean} isUpvote - Indicates whether the score should be incremented (true) or decremented (false).
+ * @param {HTMLElement} clickedEl - The HTML element that was clicked to trigger the score update.
+ * @param {Object} appData - The application state object containing the comments.
+ */
+const updateScore = function (isUpvote, clickedEl, appData) {
+  const revelantEl = clickedEl.closest(".comment-wrapper");
+  const revelantObj = findObjFromEl(appData.comments, revelantEl);
+
+  // Updating the score of relevant comment obj
+  isUpvote ? revelantObj.score++ : revelantObj.score--;
+
+  // Updating the score of relevant comment el in UI
+  const scoreEl = revelantEl.querySelector(".rate-number");
+  scoreEl.textContent = revelantObj.score;
+
+  saveToLocalStorage(appData);
+};
+
 // Event handlers
 window.addEventListener("resize", function () {
   const screenWidth = window.innerWidth;
@@ -1049,4 +1070,24 @@ document.body.addEventListener("click", function (e) {
       // console.log(editingObjs, editingEls);
     });
   }
+});
+
+// Event deligation for plus btns
+containerEl.addEventListener("click", function (e) {
+  const clickedEl = e.target;
+
+  // Matching strategy
+  if (!clickedEl.closest(".upvote-icon")) return;
+
+  updateScore(true, clickedEl, appState);
+});
+
+// Event deligation for minus btns
+containerEl.addEventListener("click", function (e) {
+  const clickedEl = e.target;
+
+  // Matching strategy
+  if (!clickedEl.closest(".downvote-icon")) return;
+
+  updateScore(false, clickedEl, appState);
 });
