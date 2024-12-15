@@ -1091,3 +1091,16 @@ containerEl.addEventListener("click", function (e) {
 
   updateScore(false, clickedEl, appState);
 });
+
+const FIVE_MINUTES_IN_MLS = 5 * 60 * 1000;
+
+setInterval(function () {
+  const allEls = [...document.querySelectorAll(".comment-wrapper")];
+
+  allEls.forEach(el => {
+    const dateEl = el.querySelector(".comment-date");
+    const revelantObj = findObjFromEl(appState.comments, el);
+
+    dateEl.textContent = timeToRender(revelantObj.createdAt);
+  });
+}, FIVE_MINUTES_IN_MLS);
