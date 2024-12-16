@@ -250,9 +250,7 @@ const renderCommentEl = function (
               </div>
             </div>
             <div class="comment-detail-body">
-              <p>
-                ${makeCommentReplyDescHTML(commentObj)}
-              </p>
+                ${makeCommentReplyDescHTML(commentObj)}       
             </div>
           </div>
         </div>
@@ -622,6 +620,19 @@ const showAddedCommentReply = function (allEls) {
 };
 
 /**
+ * Renders an error message for an empty input field.
+ *
+ * @param {HTMLElement} fieldEl - The input field element.
+ * @param {HTMLElement} fieldWrapperEl - The wrapper element for the input field.
+ * @returns {void}
+ */
+const renderEmptyFieldError = function (fieldEl, fieldWrapperEl) {
+  fieldEl.focus();
+
+  fieldWrapperEl.classList.add("show-error");
+};
+
+/**
  * Finds the comment or reply object from the provided array of comment objects based on the element's data-id attribute.
  *
  * @param {Object[]} commentObjs - An array of comment objects.
@@ -707,9 +718,7 @@ const isReplyFieldEmpty = function (fieldEl, replyToUsername) {
   const replyText = fieldEl.value;
 
   return (
-    replyText === "" ||
-    replyText === `@${replyToUsername}.` ||
-    replyText === `@${replyToUsername}`
+    replyText === `@${replyToUsername}.` || replyText === `@${replyToUsername}`
   );
 };
 
@@ -817,7 +826,7 @@ const resetEditingFields = function (editingEls, editingObjs) {
   editingEls.forEach((el, i) => {
     const obj = editingObjs[i];
 
-    const editField = el.querySelector(".add-comment-field");
+    const editFieldWrapper = el.querySelector(".add-comment-field-wrapper");
     const updateBtn = el.querySelector(".comment-update");
     const descWrapperEl = el.querySelector(".comment-detail-body");
 
@@ -825,7 +834,7 @@ const resetEditingFields = function (editingEls, editingObjs) {
     // console.log(editField);
 
     // Removing all edit fields and update btns in page
-    editField.remove();
+    editFieldWrapper.remove();
     updateBtn.remove();
 
     const descHTML = makeCommentReplyDescHTML(obj);
@@ -872,9 +881,17 @@ window.addEventListener("resize", function () {
 
 sendBtn.addEventListener("click", function (e) {
   e.preventDefault();
-  const textareaContent = e.target.previousElementSibling.value;
 
-  if (textareaContent === "") return;
+  const addCommentFieldEl =
+    e.target.previousElementSibling.querySelector(".add-comment-field");
+  const addCommentFieldWrapperEl = e.target.previousElementSibling;
+  const textareaContent = addCommentFieldEl.value;
+
+  if (textareaContent.trim() === "") {
+    renderEmptyFieldError(addCommentFieldEl, addCommentFieldWrapperEl);
+
+    return;
+  }
 
   const newCommentObj = createCommentReplyObj(appState, textareaContent);
   // console.log(appState.comments);
@@ -919,11 +936,11 @@ containerEl.addEventListener("click", function (e) {
   commentDescEl.remove();
 
   const editFieldHTML = `
-<textarea class="add-comment-field" placeholder="Add a comment...">
-${revelantObj.replyingTo ? "@" + revelantObj.replyingTo : ""}${
-    revelantObj.content
-  }
+  <div class="add-comment-field-wrapper">
+<textarea class="add-comment-field" placeholder="Add a comment..." required>
+${revelantObj.content}
 </textarea>
+</div>
   `;
 
   commentBodyEl.insertAdjacentHTML("afterbegin", editFieldHTML);
@@ -950,19 +967,27 @@ containerEl.addEventListener("click", function (e) {
   const revelantObj = findObjFromEl(appState.comments, revelantEl);
   //   console.log(revelantObj);
 
-  const newEditedContent = revelantEl
-    .querySelector(".add-comment-field")
-    .value.replace(new RegExp(`@${revelantObj.replyingTo}\\.?`), "");
+  const textFieldWrapperEl = revelantEl.querySelector(
+    ".add-comment-field-wrapper"
+  );
+  const textFieldEl = revelantEl.querySelector(".add-comment-field");
+
+  const newEditedContent = textFieldEl.value;
+
+  if (newEditedContent.trim() === "") {
+    renderEmptyFieldError(textFieldEl, textFieldWrapperEl);
+
+    return;
+  }
 
   revelantObj.content = newEditedContent;
 
   // Elemensts selection to change comment layout for updating it
   const commentEl = revelantEl.querySelector(".comment");
   const commentBodyEl = revelantEl.querySelector(".comment-detail-body");
-  const textFieldEl = revelantEl.querySelector(".add-comment-field");
   const updateBtnHTML = revelantEl.querySelector(".comment-update");
 
-  textFieldEl.remove();
+  textFieldWrapperEl.remove();
 
   const descHTML = makeCommentReplyDescHTML(revelantObj);
 
@@ -1037,10 +1062,13 @@ containerEl.addEventListener("click", function (e) {
       "/assets/images"
     )}" alt="">
   </div>
-  <textarea class="add-comment-field" placeholder="Add a comment..."></textarea>
+  <div class="add-comment-field-wrapper">
+    <textarea class="add-comment-field" placeholder="Add a comment..."></textarea>
+  </div>
   <button class="primary-btn confirm-reply-btn">REPLY</button>
 </form>
   `;
+  // console.log(addReplyHTML);
 
   revelantEl.insertAdjacentHTML("beforeend", addReplyHTML);
 
@@ -1065,12 +1093,12 @@ containerEl.addEventListener("click", function (e) {
 // Event delegation for reply confirm reply btns
 containerEl.addEventListener("click", function (e) {
   e.preventDefault();
-  const clicked = e.target;
+  const clickedEl = e.target;
 
   // Matching strategy
-  if (!clicked.classList.contains("confirm-reply-btn")) return;
+  if (!clickedEl.classList.contains("confirm-reply-btn")) return;
 
-  const updateRelevantEl = clicked.closest(".comment-wrapper");
+  const updateRelevantEl = clickedEl.closest(".comment-wrapper");
 
   const selectedInfoForReplyConfirm = infoForReplyConfirm.find(
     ([relevantEl]) => relevantEl === updateRelevantEl
@@ -1080,8 +1108,18 @@ containerEl.addEventListener("click", function (e) {
   const [revelantEl, revelantObj] = selectedInfoForReplyConfirm;
   const addReplyEl = revelantEl.querySelector(".add-comment-wrapper");
   const addRelpyFieldEl = revelantEl.querySelector(".add-comment-field");
+  const addRelpyFieldWrapperEl = revelantEl.querySelector(
+    ".add-comment-field-wrapper"
+  );
   const replyText = revelantEl.querySelector(".add-comment-field").value;
   const commentReplyWrapperEl = revelantEl.closest(".comment-reply-wrapper");
+
+  if (replyText.trim() === "") {
+    renderEmptyFieldError(addRelpyFieldEl, addRelpyFieldWrapperEl);
+
+    return;
+  }
+
   addReplyEl.remove();
 
   if (isReplyFieldEmpty(addRelpyFieldEl, revelantObj.user.username)) {
@@ -1175,6 +1213,20 @@ containerEl.addEventListener("click", function (e) {
   updateScore(false, clickedEl, appState);
 });
 
+// Event deligation for textarea fields when user starts typing after empty field error.
+containerEl.addEventListener("input", function (e) {
+  const fieldCahnged = e.target;
+
+  // Matching strategy
+  if (!fieldCahnged.classList.contains("add-comment-field")) return;
+
+  const fieldWrapperEl = fieldCahnged.parentElement;
+
+  // Hide show error el when user starts typing after empty field error.
+  fieldWrapperEl.classList.remove("show-error");
+});
+
+// Timers
 // Updating comment and reply posted time every 5 minutes automatically for ever.
 setInterval(function () {
   const allEls = getAllCommentReplyEls();

@@ -14,3 +14,7 @@
   display: block !important;
   opacity: 1 !important;
 }
+.show-error::after {
+  display: block;
+  animation: shake-horizontal 0.4s ease 1;
+}

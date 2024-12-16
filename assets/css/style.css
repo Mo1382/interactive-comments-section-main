@@ -33,10 +33,14 @@ body {
   position: relative;
 }
 
-.add-comment-field {
+.add-comment-field-wrapper {
   flex-grow: 1;
+  position: relative;
   flex-shrink: 1000;
   margin: 0 16px;
+}
+.add-comment-field-wrapper .add-comment-field {
+  width: 100%;
   min-height: 96px;
   border-radius: 8px;
   border: 1px solid #eaecf1;
@@ -48,20 +52,47 @@ body {
   transition: border-color 0.2s ease;
   outline: none;
 }
-.add-comment-field:focus {
+.add-comment-field-wrapper .add-comment-field:focus {
   border-color: #67727e;
 }
-.add-comment-field ::-moz-placeholder {
+.add-comment-field-wrapper .add-comment-field::-moz-placeholder {
   color: #a5a5a5;
   font-size: 16px;
   font-weight: 500;
 }
-.add-comment-field ::placeholder {
+.add-comment-field-wrapper .add-comment-field::placeholder {
   color: #a5a5a5;
   font-size: 16px;
   font-weight: 500;
+}
+.add-comment-field-wrapper::after {
+  content: "Please fill out this field.";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -15px;
+  border-radius: 57px;
+  padding: 10px 25px;
+  background-color: #ff6666;
+  color: #f3f3f3;
+  font-size: 13px;
+  display: none;
 }
 
+@keyframes shake-horizontal {
+  0% {
+    left: 50%;
+  }
+  25% {
+    left: 51%;
+  }
+  75% {
+    left: 49%;
+  }
+  100% {
+    left: 50%;
+  }
+}
 .primary-btn {
   width: 104px;
   height: 46px;
@@ -499,4 +530,9 @@ body {
 .show-el {
   display: block !important;
   opacity: 1 !important;
+}
+
+.show-error::after {
+  display: block;
+  animation: shake-horizontal 0.4s ease 1;
 }/*# sourceMappingURL=style.css.map */

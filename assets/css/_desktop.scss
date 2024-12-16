@@ -4,28 +4,60 @@ body {
 }
 
 // Styles for sections in different parts
-.add-comment-field {
+.add-comment-field-wrapper {
   flex-grow: 1;
+  position: relative;
   // Preventing side elements to get smaller
   flex-shrink: 1000;
   margin: 0 16px;
-  min-height: 96px;
-  border-radius: 8px;
-  border: 1px solid $neutral-light-gray;
-  padding: 12px 20px;
-  font-size: 16px;
-  font-weight: $regular-weight;
-  line-height: 26px;
-  color: $neutral-dark-blue;
-  transition: border-color 0.2s ease;
-  outline: none;
-  &:focus {
-    border-color: $neutral-grayish-blue;
-  }
-  ::placeholder {
-    color: #a5a5a5;
+  .add-comment-field {
+    width: 100%;
+    min-height: 96px;
+    border-radius: 8px;
+    border: 1px solid $neutral-light-gray;
+    padding: 12px 20px;
     font-size: 16px;
-    font-weight: $medium-weight;
+    font-weight: $regular-weight;
+    line-height: 26px;
+    color: $neutral-dark-blue;
+    transition: border-color 0.2s ease;
+    outline: none;
+    &:focus {
+      border-color: $neutral-grayish-blue;
+    }
+    &::placeholder {
+      color: #a5a5a5;
+      font-size: 16px;
+      font-weight: $medium-weight;
+    }
+  }
+  &::after {
+    content: "Please fill out this field.";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -15px;
+    border-radius: 57px;
+    padding: 10px 25px;
+    background-color: #ff6666;
+    color: #f3f3f3;
+    font-size: 13px;
+    display: none;
+  }
+}
+
+@keyframes shake-horizontal {
+  0% {
+    left: 50%;
+  }
+  25% {
+    left: 51%;
+  }
+  75% {
+    left: 49%;
+  }
+  100% {
+    left: 50%;
   }
 }
 
