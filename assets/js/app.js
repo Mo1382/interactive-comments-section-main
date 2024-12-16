@@ -1,12 +1,12 @@
-// After page loaded
 // Data
 const storage = localStorage.getItem("appData");
 // console.log(storage);
-
 let isScreenDesktop;
 // Declaring here to be accessible in deleteBtn element event handler
 let deletingEl;
 const infoForReplyConfirm = [];
+// Constant numbers
+const FIVE_MINUTES_IN_MLS = 5 * 60 * 1000;
 
 // DOM Elements
 const containerEl = document.querySelector(".container");
@@ -83,9 +83,8 @@ const setPropFalse = function (commentObjs, propName) {
  * @param {string} secondUsername - The second username to compare.
  * @returns {boolean} - True if the usernames are the same, false otherwise.
  */
-const hasSameUsernames = function (firstUsername, secondUsername) {
-  return firstUsername === secondUsername;
-};
+const hasSameUsernames = (firstUsername, secondUsername) =>
+  firstUsername === secondUsername;
 
 /**
  * Filters the comments and replies in the provided application data to only include those made by the current user.
@@ -146,6 +145,25 @@ const timeToRender = function (createdDateStr) {
   if (timeDiffMinutes >= 1)
     return `${timeDiffMinutes} minute${timeDiffMinutes !== 1 ? "s" : ""} ago`;
   if (timeDiffMinutes < 1) return "now";
+};
+
+/**
+ * Generates an HTML string for a comment/reply description.
+ *
+ * @param {Object} obj - An object containing the reply details.
+ * @param {string} obj.replyingTo - The username of the person being replied to.
+ * @param {string} obj.content - The content of the reply.
+ * @returns {string} The HTML string for the comment reply description.
+ */
+const makeCommentReplyDescHTML = function (obj) {
+  return `<p>
+      ${
+        obj.replyingTo
+          ? `<span class="replied-username"> ${"@" + obj.replyingTo}</span>`
+          : ""
+      }
+      ${obj.content}
+    </p>`;
 };
 
 /**
@@ -233,7 +251,7 @@ const renderCommentEl = function (
             </div>
             <div class="comment-detail-body">
               <p>
-                ${commentObj.content}
+                ${makeCommentReplyDescHTML(commentObj)}
               </p>
             </div>
           </div>
@@ -326,11 +344,7 @@ const renderReplyEl = function (
                 </div>
               </div>
               <div class="comment-detail-body">
-                <p>
-                  <span class="replied-username">@${
-                    replyObj.replyingTo
-                  }</span> ${replyObj.content}
-                </p>
+              ${makeCommentReplyDescHTML(replyObj)}
               </div>
             </div>
           </div>
@@ -495,6 +509,36 @@ const init = function (appData) {
 init(appState);
 
 /**
+ * Retrieves all the comment and reply wrapper elements on the page.
+ *
+ * @returns {HTMLElement[]} An array of all the comment and reply wrapper elements.
+ */
+const getAllCommentReplyEls = () => [
+  ...document.querySelectorAll(".comment-wrapper"),
+];
+
+/**
+ * Retrieves all the reply objects from the provided array of comment objects.
+ *
+ * @param {Object[]} commentObjs - An array of comment objects, each containing a `replies` property.
+ * @returns {Object[]} An array of all the reply objects from the provided comment objects.
+ */
+const getAllReplyObjs = commentObjs =>
+  commentObjs.flatMap(comment => comment.replies);
+
+/**
+ * Retrieves an array containing all comment and reply objects.
+ *
+ * @param {Object[]} allComments - An array of all comment objects.
+ * @param {Object[]} allReplies - An array of all reply objects.
+ * @returns {Object[]} An array containing all comment and reply objects.
+ */
+const getAllCommentReplyObjs = (allComments, allReplies) => [
+  ...allComments,
+  ...allReplies,
+];
+
+/**
  * Creates a new comment object with the provided content and adds it to the application state.
  *
  * @param {Object} appData - The application data object containing the comments and replies.
@@ -515,12 +559,15 @@ const createCommentReplyObj = function (
   // }, 0);
   //   console.log(commentsNum, repliesNum);
 
-  const allReplies = appState.comments.flatMap(comment => comment.replies);
-  const allCommantsReplies = [...appState.comments, ...allReplies];
+  const allReplies = getAllReplyObjs(appState.comments);
+  const allCommentReplies = getAllCommentReplyObjs(
+    appState.comments,
+    allReplies
+  );
 
-  const maxId = allCommantsReplies.reduce((max, obj) => {
+  const maxId = allCommentReplies.reduce((max, obj) => {
     return obj.id > max ? obj.id : max;
-  }, allCommantsReplies[0].id);
+  }, allCommentReplies[0].id);
 
   const commentReplyDiff = new Map();
   if (isComment) commentReplyDiff.set("replies", []);
@@ -702,6 +749,109 @@ const updateScore = function (isUpvote, clickedEl, appData) {
   saveToLocalStorage(appData);
 };
 
+/**
+ * Deletes an object from a collection of comment objects or their replies.
+ *
+ * @param {boolean} isComment - Indicates whether the object to be deleted is a top-level comment or a reply.
+ * @param {Object[]} commentObjs - The collection of comment objects, or the replies array of a comment object.
+ * @param {Object} deletingObj - The object to be deleted.
+ */
+const deleteObj = function (isComment, commentObjs, deletingObj) {
+  // Finding deleting obj wrapper to delete it from there
+  const deletingObjWrapper = isComment
+    ? commentObjs
+    : commentObjs.find(commentObj => commentObj.replies.includes(deletingObj))
+        .replies;
+
+  // Finding deleting obj index in its wrapper obj
+  const deleteObjIndex = deletingObjWrapper.indexOf(deletingObj);
+
+  // Deleting the deleting obj from its wrapper
+  deletingObjWrapper.splice(deleteObjIndex, 1);
+};
+
+/**
+ * Removes a comment or reply element from the DOM after a specified duration.
+ *
+ * @param {HTMLElement} deletingEl - The comment or reply element to be removed.
+ * @param {number} hideDurationMls - The duration in milliseconds after which the element will be removed.
+ */
+const removeDeletingEl = function (deletingEl, hideDurationMls) {
+  let isGoingToDelete;
+  const deletingWrapperEl = deletingEl.parentElement;
+
+  if (!deletingEl.classList.contains("reply-comment-wrapper"))
+    // Executed when user wants to delete the comment
+    isGoingToDelete = deletingWrapperEl;
+  else if (deletingWrapperEl.children.length === 1)
+    // Executed when user wants to delete the only reply of a comment
+    isGoingToDelete = deletingWrapperEl;
+  // Executed when user wants to delete the one reply of a comment
+  else isGoingToDelete = deletingEl;
+
+  isGoingToDelete.style.opacity = 0;
+  setTimeout(() => {
+    isGoingToDelete.remove();
+  }, hideDurationMls);
+};
+
+/**
+ * CLoses all replying fields in UI and resets their state.
+ *
+ * @param {HTMLElement[]} replyingEls - An array of HTML elements representing the replying fields.
+ * @param {Object[]} replyingObjs - An array of objects representing the replying state.
+ */
+const resetReplyingFields = function (replyingEls, replyingObjs) {
+  replyingEls.forEach(el => el.querySelector(".add-comment-wrapper").remove());
+
+  replyingObjs.forEach(obj => (obj.isReplying = false));
+};
+
+/**
+ * CLoses all editing fields in UI and resets their state.
+ *
+ * @param {HTMLElement[]} editingEls - An array of HTML elements representing the comment elements being edited.
+ * @param {Object[]} editingObjs - An array of objects representing the comment objects being edited.
+ */
+const resetEditingFields = function (editingEls, editingObjs) {
+  editingEls.forEach((el, i) => {
+    const obj = editingObjs[i];
+
+    const editField = el.querySelector(".add-comment-field");
+    const updateBtn = el.querySelector(".comment-update");
+    const descWrapperEl = el.querySelector(".comment-detail-body");
+
+    // console.log(obj, el);
+    // console.log(editField);
+
+    // Removing all edit fields and update btns in page
+    editField.remove();
+    updateBtn.remove();
+
+    const descHTML = makeCommentReplyDescHTML(obj);
+
+    descWrapperEl.insertAdjacentHTML("afterbegin", descHTML);
+
+    obj.isEditing = false;
+    // console.log(editingObjs, editingEls);
+  });
+};
+
+/**
+ * Updates the posted time for each comment element in the UI.
+ *
+ * @param {HTMLElement[]} allEls - An array of HTML elements representing the comment elements.
+ * @param {Object[]} commentObjs - An array of comment objects corresponding to the comment elements.
+ */
+const updateCommentsPostedTime = function (allEls, commentObjs) {
+  allEls.forEach(el => {
+    const dateEl = el.querySelector(".comment-date");
+    const revelantObj = findObjFromEl(commentObjs, el);
+
+    dateEl.textContent = timeToRender(revelantObj.createdAt);
+  });
+};
+
 // Event handlers
 window.addEventListener("resize", function () {
   const screenWidth = window.innerWidth;
@@ -814,13 +964,7 @@ containerEl.addEventListener("click", function (e) {
 
   textFieldEl.remove();
 
-  const descHTML = `
-<p>
-<span class="replied-username">${
-    revelantObj.replyingTo ? "@" + revelantObj.replyingTo : ""
-  }</span> ${revelantObj.content}
-</p>
-  `;
+  const descHTML = makeCommentReplyDescHTML(revelantObj);
 
   commentBodyEl.insertAdjacentHTML("afterbegin", descHTML);
 
@@ -852,47 +996,13 @@ modalDeleteBtn.addEventListener("click", function (e) {
 
   const isComment = deletingObj.replyingTo ? false : true;
 
-  if (isComment) {
-    // Executed when user wants to delete the comment
-    const deletingCommentObjIndex = appState.comments.indexOf(deletingObj);
-
-    // Deleting the commentObj from the appState
-    appState.comments.splice(deletingCommentObjIndex, 1);
-  } else {
-    // Executed when user wants to delete the reply
-    const repliesIncludeDeletingReply = appState.comments.find(commentObj =>
-      commentObj.replies.includes(deletingObj)
-    ).replies;
-
-    const deletingReplyObjIndex =
-      repliesIncludeDeletingReply.indexOf(deletingObj);
-
-    // Deleting the replyObj from the appState
-    repliesIncludeDeletingReply.splice(deletingReplyObjIndex, 1);
-  }
+  deleteObj(isComment, appState.comments, deletingObj);
 
   const elHideDurationMs = calcElAnimeDuration(
     document.querySelector(".comment-reply-wrapper")
   );
 
-  let isGoingToDelete;
-
-  // Deleting the commentEl from the DOM
-  if (!deletingEl.classList.contains("reply-comment-wrapper")) {
-    // Executed when user wants to delete the comment
-    isGoingToDelete = deletingEl.parentElement;
-  } else {
-    // Executed when user wants to delete the reply
-    const repliesWrapperEl = deletingEl.parentElement;
-    if (repliesWrapperEl.children.length === 1)
-      isGoingToDelete = deletingEl.parentElement;
-    else isGoingToDelete = deletingEl;
-  }
-
-  isGoingToDelete.style.opacity = 0;
-  setTimeout(() => {
-    isGoingToDelete.remove();
-  }, elHideDurationMs);
+  removeDeletingEl(deletingEl, elHideDurationMs);
 
   deletingEl = undefined;
 
@@ -1010,15 +1120,18 @@ containerEl.addEventListener("click", function (e) {
 
 // Event listener to close reply and edit field when user clicks outside of them
 document.body.addEventListener("click", function (e) {
-  const allCommentReplyEls = [...document.querySelectorAll(".comment-wrapper")];
+  const allCommentReplyEls = getAllCommentReplyEls();
 
-  const allReplies = appState.comments.flatMap(comment => comment.replies);
-  const allCommantsReplies = [...appState.comments, ...allReplies];
-  // console.log(allCommantsReplies);
+  const allReplies = getAllReplyObjs(appState.comments);
+  const allCommentReplies = getAllCommentReplyObjs(
+    appState.comments,
+    allReplies
+  );
+  // console.log(allCommentReplies);
 
-  const replyingObjs = allCommantsReplies.filter(comment => comment.isReplying);
+  const replyingObjs = allCommentReplies.filter(comment => comment.isReplying);
 
-  const editingObjs = allCommantsReplies.filter(comment => comment.isEditing);
+  const editingObjs = allCommentReplies.filter(comment => comment.isEditing);
   // console.log(replyingObjs, editingObjs);
 
   const replyingEls = replyingObjs.map(obj =>
@@ -1034,41 +1147,11 @@ document.body.addEventListener("click", function (e) {
 
   if (replyingObjs.length > 0 && !replyingEls.includes(clickedWrapper)) {
     // Executing when some reply fields are opened & user clicks outside of reply fields.
-    replyingEls.forEach(el =>
-      el.querySelector(".add-comment-wrapper").remove()
-    );
-
-    replyingObjs.forEach(obj => (obj.isReplying = false));
+    resetReplyingFields(replyingEls, replyingObjs);
   }
   if (editingObjs.length > 0 && !editingEls.includes(clickedWrapper)) {
     // Executing when some edit fields are opened & user clicks outside of edit fields.
-    editingEls.forEach((el, i) => {
-      const obj = editingObjs[i];
-
-      const editField = el.querySelector(".add-comment-field");
-      const updateBtn = el.querySelector(".comment-update");
-      const descWrapperEl = el.querySelector(".comment-detail-body");
-
-      // console.log(obj, el);
-      // console.log(editField);
-
-      // Removing all edit fields and update btns in page
-      editField.remove();
-      updateBtn.remove();
-
-      const descHTML = `
-<p>
-<span class="replied-username">${
-        obj.replyingTo ? "@" + obj.replyingTo : ""
-      }</span> ${obj.content}
-</p>
-      `;
-
-      descWrapperEl.insertAdjacentHTML("afterbegin", descHTML);
-
-      obj.isEditing = false;
-      // console.log(editingObjs, editingEls);
-    });
+    resetEditingFields(editingEls, editingObjs);
   }
 });
 
@@ -1092,15 +1175,9 @@ containerEl.addEventListener("click", function (e) {
   updateScore(false, clickedEl, appState);
 });
 
-const FIVE_MINUTES_IN_MLS = 5 * 60 * 1000;
-
+// Updating comment and reply posted time every 5 minutes automatically for ever.
 setInterval(function () {
-  const allEls = [...document.querySelectorAll(".comment-wrapper")];
+  const allEls = getAllCommentReplyEls();
 
-  allEls.forEach(el => {
-    const dateEl = el.querySelector(".comment-date");
-    const revelantObj = findObjFromEl(appState.comments, el);
-
-    dateEl.textContent = timeToRender(revelantObj.createdAt);
-  });
+  updateCommentsPostedTime(allEls, appState.comments);
 }, FIVE_MINUTES_IN_MLS);
