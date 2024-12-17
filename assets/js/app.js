@@ -8,18 +8,7 @@ const infoForReplyConfirm = [];
 // Constant numbers
 const FIVE_MINUTES_IN_MLS = 5 * 60 * 1000;
 
-// DOM Elements
-const containerEl = document.querySelector(".container");
-const addCommentEl = document.querySelector(
-  ".container > .add-comment-wrapper"
-);
-const addCommentFieldEl = addCommentEl.querySelector(".add-comment-field");
-const commentReplyWrapperEl = document.querySelector(".comment-reply-wrapper");
-const sendBtn = document.querySelector("#send-btn");
-const modalOverlayEl = document.querySelector(".modal-overlay");
-const modalWrapperEl = document.querySelector(".modal-wrapper");
-const modalDeleteBtn = document.querySelector(".delete-modal-btn");
-const modalCancelBtn = document.querySelector(".cancel-modal-btn");
+let addCommentEl;
 
 // Functions
 /**
@@ -47,6 +36,42 @@ const getData = async function (url) {
  */
 const saveToLocalStorage = function (data) {
   localStorage.setItem("appData", JSON.stringify(data));
+};
+
+/**
+ * Renders the initial HTML structure for the application, including a modal overlay and a container for the comment form.
+ *
+ * @param {HTMLElement} initHTMLWrapper - The HTML element where the initial HTML structure will be inserted.
+ */
+const renderInitHTML = function (initHTMLWrapper) {
+  const initHTML = `
+  <section class="modal-overlay">
+    <div class="modal-wrapper">
+      <h3 class="modal-title">Delete comment</h3>
+      <div class="modal-desc">
+        Are you sure you want to delete this comment? This will remove the
+        comment and can't be undone.
+      </div>
+      <div class="modal-footer">
+        <button class="cancel-modal-btn">NO, CANCEL</button>
+        <button class="delete-modal-btn">YES, DELETE</button>
+      </div>
+    </div>
+  </section>
+  <main class="container">
+  <form class="add-comment-wrapper">
+      <div class="add-comment-thumb">
+        <img src="" alt="">
+      </div>
+      <div class="add-comment-field-wrapper">
+        <textarea class="add-comment-field" placeholder=" Add a comment..." required></textarea>
+      </div>
+      <button type="submit" id="send-btn" class="primary-btn">SEND</button>
+    </form>
+  </main>
+  `;
+
+  initHTMLWrapper.insertAdjacentHTML("afterbegin", initHTML);
 };
 
 /**
@@ -540,6 +565,11 @@ const appState = storage
  * @param {Object} appData - The application data object containing the comments and replies.
  */
 const init = function (appData) {
+  renderInitHTML(document.body);
+
+  // Move here to be accessible for renderCommentsReplies function.
+  addCommentEl = document.querySelector(".container > .add-comment-wrapper");
+
   setAddCommentThumb(document.querySelector(".add-comment-wrapper"), appData);
 
   // Setting isReplying to false for all comments and replies
@@ -557,6 +587,18 @@ const init = function (appData) {
 };
 
 init(appState);
+
+// DOM Elements (move here after init HTML rendered to be accesssible))
+const containerEl = document.querySelector(".container");
+const addCommentFieldEl = addCommentEl.querySelector(
+  ".container > .add-comment-wrapper .add-comment-field"
+);
+const commentReplyWrapperEl = document.querySelector(".comment-reply-wrapper");
+const sendBtn = document.querySelector("#send-btn");
+const modalOverlayEl = document.querySelector(".modal-overlay");
+const modalWrapperEl = document.querySelector(".modal-wrapper");
+const modalDeleteBtn = document.querySelector(".delete-modal-btn");
+const modalCancelBtn = document.querySelector(".cancel-modal-btn");
 
 /**
  * Retrieves all the comment and reply wrapper elements on the page.
