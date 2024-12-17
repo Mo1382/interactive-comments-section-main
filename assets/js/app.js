@@ -148,279 +148,18 @@ const timeToRender = function (createdDateStr) {
 };
 
 /**
- * Generates an HTML string for a comment/reply description.
+ * Sets the thumbnail image dynamically for the add comment element.
  *
- * @param {Object} obj - An object containing the reply details.
- * @param {string} obj.replyingTo - The username of the person being replied to.
- * @param {string} obj.content - The content of the reply.
- * @returns {string} The HTML string for the comment reply description.
+ * @param {HTMLElement} addCommentEl - The HTML element representing the add comment section.
+ * @param {Object} appData - An object containing the current user's data, including the image URL.
  */
-const makeCommentReplyDescHTML = function (obj) {
-  return `<p>
-      ${
-        obj.replyingTo
-          ? `<span class="replied-username"> ${"@" + obj.replyingTo}</span>`
-          : ""
-      }
-      ${obj.content}
-    </p>`;
-};
+const setAddCommentThumb = function (addCommentEl, appData) {
+  const thumbnailEl = addCommentEl.querySelector(".add-comment-thumb img");
 
-/**
- * Renders a comment element with the provided comment object, comment number, and next element.
- *
- * @param {Object} commentObj - The comment object containing the data to render.
- * @param {number} commentNum - The number of the comment.
- * @param {HTMLElement} nextEL - The next element to insert the comment element before.
- * @param {boolean} [isHidden=false] - Whether the comment element should be initially hidden.
- */
-const renderCommentEl = function (
-  commentObj,
-  nextEL,
-  isHidden = false,
-  isCurrentUser
-) {
-  const btnsHTML = isCurrentUser
-    ? `<div class="comment-btn delete-btn">
-<svg width="12" height="14" xmlns="http://www.w3.org/2000/svg">
-    <path
-    d="M1.167 12.448c0 .854.7 1.552 1.555 1.552h6.222c.856 0 1.556-.698 1.556-1.552V3.5H1.167v8.948Zm10.5-11.281H8.75L7.773 0h-3.88l-.976 1.167H0v1.166h11.667V1.167Z"
-    fill="#ED6368" />
-</svg>
-<span>Delete</span>
-</div>
-<div class="comment-btn edit-btn">
-<svg width="14" height="14" xmlns="http://www.w3.org/2000/svg">
-    <path
-    d="M13.479 2.872 11.08.474a1.75 1.75 0 0 0-2.327-.06L.879 8.287a1.75 1.75 0 0 0-.5 1.06l-.375 3.648a.875.875 0 0 0 .875.954h.078l3.65-.333c.399-.04.773-.216 1.058-.499l7.875-7.875a1.68 1.68 0 0 0-.061-2.371Zm-2.975 2.923L8.159 3.449 9.865 1.7l2.389 2.39-1.75 1.706Z"
-    fill="#5357B6" />
-</svg>
-<span>Edit</span>
-</div>`
-    : `<div class="comment-btn reply-btn">
-            <svg width="14" height="13" xmlns="http://www.w3.org/2000/svg">
-            <path
-                d="M.227 4.316 5.04.16a.657.657 0 0 1 1.085.497v2.189c4.392.05 7.875.93 7.875 5.093 0 1.68-1.082 3.344-2.279 4.214-.373.272-.905-.07-.767-.51 1.24-3.964-.588-5.017-4.829-5.078v2.404c0 .566-.664.86-1.085.496L.227 5.31a.657.657 0 0 1 0-.993Z"
-                fill="#5357B6" />
-            </svg>
-            <span>Reply</span>
-        </div>`;
-
-  const commentHTML = `
-        <div class="comment-reply-wrapper" style="${
-          isHidden ? "opacity:0" : ""
-        }">
-      <div class="comment-wrapper ${
-        isCurrentUser ? "active-user-comment" : ""
-      }" data-id="${commentObj.id}">
-        <div class="comment">
-          <div class="comment-upvote-downvote">
-            <div class="upvote-icon">
-              <svg width="11" height="11" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M6.33 10.896c.137 0 .255-.05.354-.149.1-.1.149-.217.149-.354V7.004h3.315c.136 0 .254-.05.354-.149.099-.1.148-.217.148-.354V5.272a.483.483 0 0 0-.148-.354.483.483 0 0 0-.354-.149H6.833V1.4a.483.483 0 0 0-.149-.354.483.483 0 0 0-.354-.149H4.915a.483.483 0 0 0-.354.149c-.1.1-.149.217-.149.354v3.37H1.08a.483.483 0 0 0-.354.15c-.1.099-.149.217-.149.353v1.23c0 .136.05.254.149.353.1.1.217.149.354.149h3.333v3.39c0 .136.05.254.15.353.098.1.216.149.353.149H6.33Z"
-                  fill="#C5C6EF" />
-              </svg>
-            </div>
-            <span class="rate-number">${commentObj.score}</span>
-            <div class="downvote-icon">
-              <svg width="11" height="3" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M9.256 2.66c.204 0 .38-.056.53-.167.148-.11.222-.243.222-.396V.722c0-.152-.074-.284-.223-.395a.859.859 0 0 0-.53-.167H.76a.859.859 0 0 0-.53.167C.083.437.009.57.009.722v1.375c0 .153.074.285.223.396a.859.859 0 0 0 .53.167h8.495Z"
-                  fill="#C5C6EF" />
-              </svg>
-            </div>
-          </div>
-          <div class="comment-detail">
-            <div class="comment-detail-header">
-              <div class="comment-detail-header-left">
-                <div class="comment-thumbnail">
-                  <img src="${commentObj.user.image.webp.replace(
-                    "/images",
-                    "/assets/images"
-                  )}" alt="">
-                </div>
-                <div class="comment-username">${commentObj.user.username}</div>
-                <div class="comment-date">${timeToRender(
-                  commentObj.createdAt
-                )}</div>
-              </div>
-              <div class="comment-detail-header-right">
-                ${btnsHTML}
-              </div>
-            </div>
-            <div class="comment-detail-body">
-                ${makeCommentReplyDescHTML(commentObj)}       
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-        `;
-
-  // console.log(commentHTML);
-  nextEL.insertAdjacentHTML("beforebegin", commentHTML);
-};
-
-/**
- * Renders a reply element for a comment.
- *
- * @param {Object} replyObj - The reply object containing the data to render.
- * @param {HTMLElement} parentEL - The parent element to append the reply element to.
- */
-const renderReplyEl = function (
-  replyObj,
-  parentEL,
-  isHidden = false,
-  isCurrentUser
-) {
-  const btnsHTML = isCurrentUser
-    ? `<div class="comment-btn delete-btn">
-<svg width="12" height="14" xmlns="http://www.w3.org/2000/svg">
-    <path
-    d="M1.167 12.448c0 .854.7 1.552 1.555 1.552h6.222c.856 0 1.556-.698 1.556-1.552V3.5H1.167v8.948Zm10.5-11.281H8.75L7.773 0h-3.88l-.976 1.167H0v1.166h11.667V1.167Z"
-    fill="#ED6368" />
-</svg>
-<span>Delete</span>
-</div>
-<div class="comment-btn edit-btn">
-<svg width="14" height="14" xmlns="http://www.w3.org/2000/svg">
-    <path
-    d="M13.479 2.872 11.08.474a1.75 1.75 0 0 0-2.327-.06L.879 8.287a1.75 1.75 0 0 0-.5 1.06l-.375 3.648a.875.875 0 0 0 .875.954h.078l3.65-.333c.399-.04.773-.216 1.058-.499l7.875-7.875a1.68 1.68 0 0 0-.061-2.371Zm-2.975 2.923L8.159 3.449 9.865 1.7l2.389 2.39-1.75 1.706Z"
-    fill="#5357B6" />
-</svg>
-<span>Edit</span>
-</div>`
-    : `<div class="comment-btn reply-btn">
-            <svg width="14" height="13" xmlns="http://www.w3.org/2000/svg">
-            <path
-                d="M.227 4.316 5.04.16a.657.657 0 0 1 1.085.497v2.189c4.392.05 7.875.93 7.875 5.093 0 1.68-1.082 3.344-2.279 4.214-.373.272-.905-.07-.767-.51 1.24-3.964-.588-5.017-4.829-5.078v2.404c0 .566-.664.86-1.085.496L.227 5.31a.657.657 0 0 1 0-.993Z"
-                fill="#5357B6" />
-            </svg>
-            <span>Reply</span>
-        </div>`;
-
-  const replyHTML = `<div data-id="${
-    replyObj.id
-  }" class="comment-wrapper reply-comment-wrapper ${
-    isCurrentUser ? "active-user-comment" : ""
-  }" style="${isHidden ? "opacity:0" : ""}">
-          <div class="comment">
-            <div class="comment-upvote-downvote">
-              <div class="upvote-icon">
-                <svg width="11" height="11" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M6.33 10.896c.137 0 .255-.05.354-.149.1-.1.149-.217.149-.354V7.004h3.315c.136 0 .254-.05.354-.149.099-.1.148-.217.148-.354V5.272a.483.483 0 0 0-.148-.354.483.483 0 0 0-.354-.149H6.833V1.4a.483.483 0 0 0-.149-.354.483.483 0 0 0-.354-.149H4.915a.483.483 0 0 0-.354.149c-.1.1-.149.217-.149.354v3.37H1.08a.483.483 0 0 0-.354.15c-.1.099-.149.217-.149.353v1.23c0 .136.05.254.149.353.1.1.217.149.354.149h3.333v3.39c0 .136.05.254.15.353.098.1.216.149.353.149H6.33Z"
-                    fill="#C5C6EF" />
-                </svg>
-              </div>
-              <span class="rate-number">${replyObj.score}</span>
-              <div class="downvote-icon">
-                <svg width="11" height="3" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M9.256 2.66c.204 0 .38-.056.53-.167.148-.11.222-.243.222-.396V.722c0-.152-.074-.284-.223-.395a.859.859 0 0 0-.53-.167H.76a.859.859 0 0 0-.53.167C.083.437.009.57.009.722v1.375c0 .153.074.285.223.396a.859.859 0 0 0 .53.167h8.495Z"
-                    fill="#C5C6EF" />
-                </svg>
-              </div>
-            </div>
-            <div class="comment-detail">
-              <div class="comment-detail-header">
-                <div class="comment-detail-header-left">
-                  <div class="comment-thumbnail">
-                    <img src="${replyObj.user.image.webp.replace(
-                      "/images",
-                      "/assets/images"
-                    )}" alt="">
-                  </div>
-                  <div class="comment-username">${replyObj.user.username}</div>
-                  <div class="comment-date">${timeToRender(
-                    replyObj.createdAt
-                  )}</div>
-                </div>
-                <div class="comment-detail-header-right">
-                  ${btnsHTML}
-                </div>
-              </div>
-              <div class="comment-detail-body">
-              ${makeCommentReplyDescHTML(replyObj)}
-              </div>
-            </div>
-          </div>
-        </div>`;
-
-  //   console.log(replyHTML);
-  parentEL.insertAdjacentHTML("beforeend", replyHTML);
-};
-
-/**
- * Renders the comments and their replies in the UI.
- *
- * @param {Object[]} commentObjs - An array of comment objects to be rendered.
- * @param {string} commentObjs[].id - The unique identifier of the comment.
- * @param {string} commentObjs[].content - The content of the comment.
- * @param {Object} commentObjs[].user - The user who made the comment.
- * @param {string} commentObjs[].user.username - The username of the comment author.
- * @param {string} commentObjs[].user.image.webp - The URL of the comment author's profile picture.
- * @param {number} commentObjs[].createdAt - The timestamp when the comment was created.
- * @param {number} commentObjs[].score - The score (upvotes - downvotes) of the comment.
- * @param {Object[]} commentObjs[].replies - An array of reply objects for the comment.
- */
-const renderCommentsReplies = function (appData) {
-  const commentObjs = appData.comments;
-
-  commentObjs.forEach(commentObj => {
-    const isCurrentUser =
-      commentObj.user.username === appState.currentUser.username;
-
-    renderCommentEl(commentObj, addCommentEl, undefined, isCurrentUser);
-
-    // Checking if comment has any reply or not
-    if (!hasCommentAnyReply(commentObj)) return;
-
-    const commentReplyWrapperEl = document.querySelector(
-      `.comment-wrapper[data-id="${commentObj.id}"]`
-    ).parentElement;
-    const repliesWrapperEl = document.createElement("div");
-    repliesWrapperEl.classList.add("reply-wrapper");
-    commentReplyWrapperEl.append(repliesWrapperEl);
-
-    commentObj.replies.forEach(replyObj => {
-      const isCurrentUser =
-        replyObj.user.username === appState.currentUser.username;
-
-      renderReplyEl(replyObj, repliesWrapperEl, undefined, isCurrentUser);
-    });
-  });
-};
-
-/**
- * Changes the layout of the comments for mobile devices by moving the comment buttons and upvote/downvote elements to the footer of the comment detail section.
- *
- * @param {HTMLElement[]} commentEls - An array of HTML elements representing the comments.
- */
-const changeCommentsForMobiles = function (commentEls) {
-  commentEls.forEach(el => {
-    const commentBtnEls = el.querySelectorAll(".comment-btn");
-    const upvoteDownvoteEl = el.querySelector(".comment-upvote-downvote");
-    const commentDetailEl = el.querySelector(".comment-detail");
-
-    // Creating a footer element to hold the comment buttons and upvote/downvote elements
-    const detailFooterEl = document.createElement("div");
-    detailFooterEl.innerHTML = "<div class='comment-btns'></div>";
-
-    const btnsWrapper = detailFooterEl.querySelector(".comment-btns");
-
-    detailFooterEl.classList.add("comment-detail-footer");
-    commentDetailEl.append(detailFooterEl);
-
-    // Moving the upvote/downvote elements to the footer
-    detailFooterEl.prepend(upvoteDownvoteEl);
-
-    // Moving comment buttons to the footer
-    commentBtnEls.forEach(btn => {
-      btnsWrapper.append(btn);
-    });
-  });
+  thumbnailEl.setAttribute(
+    "src",
+    `${appData.currentUser.image.webp.replace("/images", "/assets/images")}`
+  );
 };
 
 /**
@@ -465,10 +204,322 @@ const setLayout = function () {
     return;
   }
   isScreenDesktop = false;
+};
 
-  const commentWrapperEls = document.querySelectorAll(".comment-wrapper");
+/**
+ * Generates an HTML string for a comment/reply description.
+ *
+ * @param {Object} obj - An object containing the reply details.
+ * @param {string} obj.replyingTo - The username of the person being replied to.
+ * @param {string} obj.content - The content of the reply.
+ * @returns {string} The HTML string for the comment reply description.
+ */
+const makeCommentReplyDescHTML = function (obj) {
+  return `<p>
+      ${
+        obj.replyingTo
+          ? `<span class="replied-username"> ${"@" + obj.replyingTo}</span>`
+          : ""
+      }
+      ${obj.content}
+    </p>`;
+};
 
-  changeCommentsForMobiles(commentWrapperEls);
+/**
+ * Renders a comment element with the provided comment object, comment number, and next element.
+ *
+ * @param {Object} commentObj - The comment object containing the data to render.
+ * @param {number} commentNum - The number of the comment.
+ * @param {HTMLElement} nextEL - The next element to insert the comment element before.
+ * @param {boolean} [isHidden=false] - Whether the comment element should be initially hidden.
+ */
+const renderCommentEl = function (
+  commentObj,
+  nextEL,
+  isHidden = false,
+  isCurrentUser,
+  isDesktop
+) {
+  const btnsHTML = isCurrentUser
+    ? `<div class="comment-btn delete-btn">
+<svg width="12" height="14" xmlns="http://www.w3.org/2000/svg">
+    <path
+    d="M1.167 12.448c0 .854.7 1.552 1.555 1.552h6.222c.856 0 1.556-.698 1.556-1.552V3.5H1.167v8.948Zm10.5-11.281H8.75L7.773 0h-3.88l-.976 1.167H0v1.166h11.667V1.167Z"
+    fill="#ED6368" />
+</svg>
+<span>Delete</span>
+</div>
+<div class="comment-btn edit-btn">
+<svg width="14" height="14" xmlns="http://www.w3.org/2000/svg">
+    <path
+    d="M13.479 2.872 11.08.474a1.75 1.75 0 0 0-2.327-.06L.879 8.287a1.75 1.75 0 0 0-.5 1.06l-.375 3.648a.875.875 0 0 0 .875.954h.078l3.65-.333c.399-.04.773-.216 1.058-.499l7.875-7.875a1.68 1.68 0 0 0-.061-2.371Zm-2.975 2.923L8.159 3.449 9.865 1.7l2.389 2.39-1.75 1.706Z"
+    fill="#5357B6" />
+</svg>
+<span>Edit</span>
+</div>`
+    : `<div class="comment-btn reply-btn">
+            <svg width="14" height="13" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M.227 4.316 5.04.16a.657.657 0 0 1 1.085.497v2.189c4.392.05 7.875.93 7.875 5.093 0 1.68-1.082 3.344-2.279 4.214-.373.272-.905-.07-.767-.51 1.24-3.964-.588-5.017-4.829-5.078v2.404c0 .566-.664.86-1.085.496L.227 5.31a.657.657 0 0 1 0-.993Z"
+                fill="#5357B6" />
+            </svg>
+            <span>Reply</span>
+        </div>`;
+
+  const upvoteDownvoteHTML = `
+  <div class="comment-upvote-downvote">
+            <div class="upvote-icon">
+              <svg width="11" height="11" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M6.33 10.896c.137 0 .255-.05.354-.149.1-.1.149-.217.149-.354V7.004h3.315c.136 0 .254-.05.354-.149.099-.1.148-.217.148-.354V5.272a.483.483 0 0 0-.148-.354.483.483 0 0 0-.354-.149H6.833V1.4a.483.483 0 0 0-.149-.354.483.483 0 0 0-.354-.149H4.915a.483.483 0 0 0-.354.149c-.1.1-.149.217-.149.354v3.37H1.08a.483.483 0 0 0-.354.15c-.1.099-.149.217-.149.353v1.23c0 .136.05.254.149.353.1.1.217.149.354.149h3.333v3.39c0 .136.05.254.15.353.098.1.216.149.353.149H6.33Z"
+                  fill="#C5C6EF" />
+              </svg>
+            </div>
+            <span class="rate-number">${commentObj.score}</span>
+            <div class="downvote-icon">
+              <svg width="11" height="3" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M9.256 2.66c.204 0 .38-.056.53-.167.148-.11.222-.243.222-.396V.722c0-.152-.074-.284-.223-.395a.859.859 0 0 0-.53-.167H.76a.859.859 0 0 0-.53.167C.083.437.009.57.009.722v1.375c0 .153.074.285.223.396a.859.859 0 0 0 .53.167h8.495Z"
+                  fill="#C5C6EF" />
+              </svg>
+            </div>
+          </div>`;
+
+  const commentFooterHTML = `
+<div class="comment-detail-footer">
+${upvoteDownvoteHTML}
+ <div class="comment-btns">
+ ${btnsHTML}
+ </div>
+    </div>
+`;
+
+  const commentHTML = `
+        <div class="comment-reply-wrapper" style="${
+          isHidden ? "opacity:0" : ""
+        }">
+      <div class="comment-wrapper ${
+        isCurrentUser ? "active-user-comment" : ""
+      }" data-id="${commentObj.id}">
+        <div class="comment">
+          ${isDesktop ? upvoteDownvoteHTML : ""}
+          <div class="comment-detail">
+            <div class="comment-detail-header">
+              <div class="comment-detail-header-left">
+                <div class="comment-thumbnail">
+                  <img src="${commentObj.user.image.webp.replace(
+                    "/images",
+                    "/assets/images"
+                  )}" alt="">
+                </div>
+                <div class="comment-username">${commentObj.user.username}</div>
+                <div class="comment-date">${timeToRender(
+                  commentObj.createdAt
+                )}</div>
+              </div>
+              <div class="comment-detail-header-right">
+              ${isDesktop ? btnsHTML : ""}
+              </div>
+            </div>
+            <div class="comment-detail-body">
+                ${makeCommentReplyDescHTML(commentObj)}       
+            </div>
+            ${!isDesktop ? commentFooterHTML : ""}
+          </div>
+        </div>
+      </div>
+    </div>
+        `;
+
+  // console.log(commentHTML);
+  nextEL.insertAdjacentHTML("beforebegin", commentHTML);
+};
+
+/**
+ * Renders a reply element for a comment.
+ *
+ * @param {Object} replyObj - The reply object containing the data to render.
+ * @param {HTMLElement} parentEL - The parent element to append the reply element to.
+ */
+const renderReplyEl = function (
+  replyObj,
+  parentEL,
+  isHidden = false,
+  isCurrentUser,
+  isDesktop
+) {
+  const btnsHTML = isCurrentUser
+    ? `<div class="comment-btn delete-btn">
+<svg width="12" height="14" xmlns="http://www.w3.org/2000/svg">
+    <path
+    d="M1.167 12.448c0 .854.7 1.552 1.555 1.552h6.222c.856 0 1.556-.698 1.556-1.552V3.5H1.167v8.948Zm10.5-11.281H8.75L7.773 0h-3.88l-.976 1.167H0v1.166h11.667V1.167Z"
+    fill="#ED6368" />
+</svg>
+<span>Delete</span>
+</div>
+<div class="comment-btn edit-btn">
+<svg width="14" height="14" xmlns="http://www.w3.org/2000/svg">
+    <path
+    d="M13.479 2.872 11.08.474a1.75 1.75 0 0 0-2.327-.06L.879 8.287a1.75 1.75 0 0 0-.5 1.06l-.375 3.648a.875.875 0 0 0 .875.954h.078l3.65-.333c.399-.04.773-.216 1.058-.499l7.875-7.875a1.68 1.68 0 0 0-.061-2.371Zm-2.975 2.923L8.159 3.449 9.865 1.7l2.389 2.39-1.75 1.706Z"
+    fill="#5357B6" />
+</svg>
+<span>Edit</span>
+</div>`
+    : `<div class="comment-btn reply-btn">
+            <svg width="14" height="13" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M.227 4.316 5.04.16a.657.657 0 0 1 1.085.497v2.189c4.392.05 7.875.93 7.875 5.093 0 1.68-1.082 3.344-2.279 4.214-.373.272-.905-.07-.767-.51 1.24-3.964-.588-5.017-4.829-5.078v2.404c0 .566-.664.86-1.085.496L.227 5.31a.657.657 0 0 1 0-.993Z"
+                fill="#5357B6" />
+            </svg>
+            <span>Reply</span>
+        </div>`;
+
+  const upvoteDownvoteHTML = `
+  <div class="comment-upvote-downvote">
+            <div class="upvote-icon">
+              <svg width="11" height="11" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M6.33 10.896c.137 0 .255-.05.354-.149.1-.1.149-.217.149-.354V7.004h3.315c.136 0 .254-.05.354-.149.099-.1.148-.217.148-.354V5.272a.483.483 0 0 0-.148-.354.483.483 0 0 0-.354-.149H6.833V1.4a.483.483 0 0 0-.149-.354.483.483 0 0 0-.354-.149H4.915a.483.483 0 0 0-.354.149c-.1.1-.149.217-.149.354v3.37H1.08a.483.483 0 0 0-.354.15c-.1.099-.149.217-.149.353v1.23c0 .136.05.254.149.353.1.1.217.149.354.149h3.333v3.39c0 .136.05.254.15.353.098.1.216.149.353.149H6.33Z"
+                  fill="#C5C6EF" />
+              </svg>
+            </div>
+            <span class="rate-number">${replyObj.score}</span>
+            <div class="downvote-icon">
+              <svg width="11" height="3" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M9.256 2.66c.204 0 .38-.056.53-.167.148-.11.222-.243.222-.396V.722c0-.152-.074-.284-.223-.395a.859.859 0 0 0-.53-.167H.76a.859.859 0 0 0-.53.167C.083.437.009.57.009.722v1.375c0 .153.074.285.223.396a.859.859 0 0 0 .53.167h8.495Z"
+                  fill="#C5C6EF" />
+              </svg>
+            </div>
+          </div>`;
+
+  const commentFooterHTML = `
+<div class="comment-detail-footer">
+${upvoteDownvoteHTML}
+ <div class="comment-btns">
+ ${btnsHTML}
+ </div>
+    </div>
+`;
+
+  const replyHTML = `<div data-id="${
+    replyObj.id
+  }" class="comment-wrapper reply-comment-wrapper ${
+    isCurrentUser ? "active-user-comment" : ""
+  }" style="${isHidden ? "opacity:0" : ""}">
+          <div class="comment">
+            ${isDesktop ? upvoteDownvoteHTML : ""}
+            <div class="comment-detail">
+              <div class="comment-detail-header">
+                <div class="comment-detail-header-left">
+                  <div class="comment-thumbnail">
+                    <img src="${replyObj.user.image.webp.replace(
+                      "/images",
+                      "/assets/images"
+                    )}" alt="">
+                  </div>
+                  <div class="comment-username">${replyObj.user.username}</div>
+                  <div class="comment-date">${timeToRender(
+                    replyObj.createdAt
+                  )}</div>
+                </div>
+                <div class="comment-detail-header-right">
+                  ${isDesktop ? btnsHTML : ""}
+                </div>
+              </div>
+              <div class="comment-detail-body">
+              ${makeCommentReplyDescHTML(replyObj)}
+              </div>
+               ${!isDesktop ? commentFooterHTML : ""}
+            </div>
+          </div>
+        </div>`;
+
+  //   console.log(replyHTML);
+  parentEL.insertAdjacentHTML("beforeend", replyHTML);
+};
+
+/**
+ * Renders the comments and their replies in the UI.
+ *
+ * @param {Object[]} commentObjs - An array of comment objects to be rendered.
+ * @param {string} commentObjs[].id - The unique identifier of the comment.
+ * @param {string} commentObjs[].content - The content of the comment.
+ * @param {Object} commentObjs[].user - The user who made the comment.
+ * @param {string} commentObjs[].user.username - The username of the comment author.
+ * @param {string} commentObjs[].user.image.webp - The URL of the comment author's profile picture.
+ * @param {number} commentObjs[].createdAt - The timestamp when the comment was created.
+ * @param {number} commentObjs[].score - The score (upvotes - downvotes) of the comment.
+ * @param {Object[]} commentObjs[].replies - An array of reply objects for the comment.
+ */
+const renderCommentsReplies = function (appData) {
+  const commentObjs = appData.comments;
+
+  commentObjs.forEach(commentObj => {
+    const isCurrentUser =
+      commentObj.user.username === appState.currentUser.username;
+
+    renderCommentEl(
+      commentObj,
+      addCommentEl,
+      undefined,
+      isCurrentUser,
+      isScreenDesktop
+    );
+
+    // Checking if comment has any reply or not
+    if (!hasCommentAnyReply(commentObj)) return;
+
+    const commentReplyWrapperEl = document.querySelector(
+      `.comment-wrapper[data-id="${commentObj.id}"]`
+    ).parentElement;
+    const repliesWrapperEl = document.createElement("div");
+    repliesWrapperEl.classList.add("reply-wrapper");
+    commentReplyWrapperEl.append(repliesWrapperEl);
+
+    commentObj.replies.forEach(replyObj => {
+      const isCurrentUser =
+        replyObj.user.username === appState.currentUser.username;
+
+      renderReplyEl(
+        replyObj,
+        repliesWrapperEl,
+        undefined,
+        isCurrentUser,
+        isScreenDesktop
+      );
+    });
+  });
+};
+
+/**
+ * Changes the layout of the comments for mobile devices by moving the comment buttons and upvote/downvote elements to the footer of the comment detail section.
+ *
+ * @param {HTMLElement[]} commentEls - An array of HTML elements representing the comments.
+ */
+const changeCommentsForMobiles = function (commentEls) {
+  commentEls.forEach(el => {
+    const commentBtnEls = el.querySelectorAll(".comment-btn");
+    const upvoteDownvoteEl = el.querySelector(".comment-upvote-downvote");
+    const commentDetailEl = el.querySelector(".comment-detail");
+
+    // Creating a footer element to hold the comment buttons and upvote/downvote elements
+    const detailFooterEl = document.createElement("div");
+    detailFooterEl.innerHTML = "<div class='comment-btns'></div>";
+
+    const btnsWrapper = detailFooterEl.querySelector(".comment-btns");
+
+    detailFooterEl.classList.add("comment-detail-footer");
+    commentDetailEl.append(detailFooterEl);
+
+    // Moving the upvote/downvote elements to the footer
+    detailFooterEl.prepend(upvoteDownvoteEl);
+
+    // Moving comment buttons to the footer
+    commentBtnEls.forEach(btn => {
+      btnsWrapper.append(btn);
+    });
+  });
 };
 
 const appState = storage
@@ -489,6 +540,8 @@ const appState = storage
  * @param {Object} appData - The application data object containing the comments and replies.
  */
 const init = function (appData) {
+  setAddCommentThumb(document.querySelector(".add-comment-wrapper"), appData);
+
   // Setting isReplying to false for all comments and replies
   setPropFalse(appData.comments, "isReplying");
   // console.log(appData);
@@ -496,12 +549,11 @@ const init = function (appData) {
   // console.log(filterUserCommentsReplies(appData));
 
   setPropFalse(filterUserCommentsReplies(appData).flat(), "isEditing");
-
   // console.log(filterUserCommentsReplies(appData));
 
-  renderCommentsReplies(appData);
-
   setLayout();
+
+  renderCommentsReplies(appData);
 };
 
 init(appState);
@@ -897,7 +949,7 @@ sendBtn.addEventListener("click", function (e) {
   // console.log(appState.comments);
 
   // Render the new comment with opacity : 0
-  renderCommentEl(newCommentObj, addCommentEl, true, true);
+  renderCommentEl(newCommentObj, addCommentEl, true, true, isScreenDesktop);
 
   showAddedCommentReply(document.querySelectorAll(".comment-reply-wrapper"));
 
@@ -1146,7 +1198,7 @@ containerEl.addEventListener("click", function (e) {
       commentReplyWrapperEl.append(replyWrapperEl);
     }
 
-    renderReplyEl(newReplyObj, replyWrapperEl, true, true);
+    renderReplyEl(newReplyObj, replyWrapperEl, true, true, isScreenDesktop);
 
     showAddedCommentReply(replyWrapperEl.querySelectorAll(".comment-wrapper"));
 

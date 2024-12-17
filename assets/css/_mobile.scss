@@ -55,8 +55,12 @@
     }
     .add-comment-wrapper {
       padding: 16px;
-      .add-comment-field {
+      .add-comment-field-wrapper {
         margin: 0 0 16px;
+        &::after {
+          font-size: 10px;
+          padding: 8px 16px;
+        }
       }
     }
   }

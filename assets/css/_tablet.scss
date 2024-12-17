@@ -1,4 +1,10 @@
 @media screen and (max-width: 795px) {
+  .add-comment-field-wrapper {
+    &::after {
+      font-size: 12px;
+      padding: 10px 20px;
+    }
+  }
   .container {
     margin: 64px 32px;
     .comment-reply-wrapper {
@@ -72,11 +78,16 @@
         height: 32px;
         order: 1;
       }
-      .add-comment-field {
+      .add-comment-field-wrapper {
         order: 0;
         width: 100%;
         margin: 0 0 20px;
+        &::after {
+          font-size: 12px;
+          padding: 10px 20px;
+        }
       }
+
       .primary-btn {
         order: 2;
       }

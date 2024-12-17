@@ -42,6 +42,7 @@ body {
     background-color: #ff6666;
     color: #f3f3f3;
     font-size: 13px;
+    text-align: center;
     display: none;
   }
 }
@@ -211,34 +212,32 @@ body {
                 color: $neutral-grayish-blue;
               }
             }
-            .comment-detail-header-right {
-              .comment-btn {
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                svg {
-                  margin-right: 8px;
-                  width: 14px;
-                  height: 13px;
-                  path {
-                    transition: fill 0.4s ease;
-                  }
-                }
-                span {
-                  font-size: 16px;
-                  font-weight: $bold-weight;
-                }
+          }
+          .comment-btn {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            svg {
+              margin-right: 8px;
+              width: 14px;
+              height: 13px;
+              path {
+                transition: fill 0.4s ease;
               }
-              .reply-btn,
-              .edit-btn {
-                color: $primary-moderate-blue;
-                transition: color 0.4s ease;
-                &:hover {
-                  color: $primary-light-grayish-blue;
-                  svg path {
-                    fill: $primary-light-grayish-blue;
-                  }
-                }
+            }
+            span {
+              font-size: 16px;
+              font-weight: $bold-weight;
+            }
+          }
+          .reply-btn,
+          .edit-btn {
+            color: $primary-moderate-blue;
+            transition: color 0.4s ease;
+            &:hover {
+              color: $primary-light-grayish-blue;
+              svg path {
+                fill: $primary-light-grayish-blue;
               }
             }
           }
@@ -318,19 +317,19 @@ body {
         }
         .comment-detail-header-right {
           display: flex;
-          .delete-btn {
-            color: $primary-soft-red;
-            transition: color 0.4s ease;
-            &:hover {
-              color: $primary-pale-red;
-              svg path {
-                fill: $primary-pale-red;
-              }
+        }
+        .delete-btn {
+          color: $primary-soft-red;
+          transition: color 0.4s ease;
+          &:hover {
+            color: $primary-pale-red;
+            svg path {
+              fill: $primary-pale-red;
             }
           }
-          .edit-btn {
-            margin-left: 24px;
-          }
+        }
+        .edit-btn {
+          margin-left: 24px;
         }
       }
     }
