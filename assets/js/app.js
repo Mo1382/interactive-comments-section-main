@@ -547,9 +547,7 @@ const changeCommentsForMobiles = function (commentEls) {
   });
 };
 
-const appState = storage
-  ? JSON.parse(storage)
-  : await getData("http://127.0.0.1:5500/data.json");
+const appState = storage ? JSON.parse(storage) : await getData("data.json");
 
 // console.log(appState);
 
